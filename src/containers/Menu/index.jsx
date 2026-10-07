@@ -1,0 +1,209 @@
+import { UsersRound, Shuffle, CalendarDays, History } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+
+import { api } from '../../services/api';
+import {
+  Cabecalho,
+  PerfilUsuario,
+  AvatarUsuario,
+  InformacoesUsuario,
+  Saudacao,
+  NomePainel,
+  Apresentacao,
+  Eyebrow,
+  Titulo,
+  Destaque,
+  Subtitulo,
+  BotaoSair,
+  CartaoResumo,
+  ValorResumo,
+  TituloResumo,
+  Pagina,
+  ResumoGrid,
+  AcaoLink,
+  SecaoAcoes,
+  TituloSecao,
+  AcoesGrid,
+  CartaoPartida,
+  CartaoSorteioVazio,
+  SecaoUltimoSorteio,
+  AcaoPrincipal,
+  IconeAcao,
+  TextoAcao,
+  TituloAcao,
+  DescricaoAcao,
+  AcaoVazia,
+} from './styles';
+
+export function Menu() {
+  const [matches, setMatches] = useState([]);
+  const [players, setPlayers] = useState([]);
+  const [carregandoJogadores, setCarregandoJogadores] = useState(true);
+  const [erroJogadores, setErroJogadores] = useState(null);
+  const [carregandoPartidas, setCarregandoPartidas] = useState(true);
+  const [erroPartidas, setErroPartidas] = useState(null);
+
+  const [usuario] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('sorteador.user') || 'null');
+    } catch {
+      return null;
+    }
+  });
+
+  const primeiroNome = usuario?.name?.trim().split(/\s+/)[0] || 'por aí';
+  const primeiroNomeFormatado =
+    primeiroNome.charAt(0).toLocaleUpperCase('pt-BR') + primeiroNome.slice(1);
+  const iniciais =
+    usuario?.name
+      ?.trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((parte) => parte[0])
+      .join('')
+      .toUpperCase() || 'VS';
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        const response = await api.get('/players');
+        setPlayers(response.data);
+      } catch (error) {
+        setErroJogadores(error.message || 'Não foi possível carregar');
+      } finally {
+        setCarregandoJogadores(false);
+      }
+    };
+
+    fetchPlayers();
+  }, []);
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const response = await api.get('/matches');
+        setMatches(response.data);
+      } catch (error) {
+        setErroPartidas(error.message || 'Não foi possível carregar');
+      } finally {
+        setCarregandoPartidas(false);
+      }
+    };
+
+    fetchMatches();
+  }, []);
+
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem('sorteador.token');
+    localStorage.removeItem('sorteador.user');
+    navigate('/login', { replace: true });
+  }
+
+  const partidasPendentes = matches.filter(
+    (partida) => partida.status === 'pending'
+  ).length;
+
+  return (
+    <Pagina>
+      <Cabecalho>
+        <PerfilUsuario>
+          <AvatarUsuario aria-hidden="true">{iniciais}</AvatarUsuario>
+          <InformacoesUsuario>
+            <Saudacao>Olá, {primeiroNomeFormatado}!</Saudacao>
+            <NomePainel>Seu espaço de sorteios</NomePainel>
+          </InformacoesUsuario>
+        </PerfilUsuario>
+
+        <BotaoSair type="button" onClick={handleLogout}>
+          Sair
+        </BotaoSair>
+      </Cabecalho>
+
+      <Apresentacao>
+        <Eyebrow>BOM TER VOCÊ POR AQUI</Eyebrow>
+        <Titulo>
+          Vamos fazer a sorte <Destaque>girar?</Destaque>
+        </Titulo>
+        <Subtitulo>Seus jogadores e partidas, tudo no mesmo lugar.</Subtitulo>
+      </Apresentacao>
+
+      <ResumoGrid>
+        <CartaoResumo>
+          <TituloResumo>Jogadores cadastrados:</TituloResumo>
+
+          <ValorResumo>
+            {carregandoJogadores
+              ? 'Carregando...'
+              : erroJogadores
+                ? 'Não foi possível carregar'
+                : players.length}
+          </ValorResumo>
+        </CartaoResumo>
+        <CartaoPartida>
+          <TituloResumo>Partidas aguardando início:</TituloResumo>
+
+          <ValorResumo>
+            {carregandoPartidas
+              ? 'Carregando...'
+              : erroPartidas
+                ? 'Não foi possível carregar'
+                : partidasPendentes}
+          </ValorResumo>
+        </CartaoPartida>
+      </ResumoGrid>
+      <SecaoUltimoSorteio aria-label="Último sorteio">
+        <TituloSecao>Último sorteio</TituloSecao>
+        <CartaoSorteioVazio>
+          <span>Ainda não há sorteios registrados.</span>
+          <AcaoVazia to="/sorteio">Fazer primeiro sorteio</AcaoVazia>
+        </CartaoSorteioVazio>
+      </SecaoUltimoSorteio>
+      <SecaoAcoes>
+        <TituloSecao>Ações rápidas</TituloSecao>
+        <AcoesGrid>
+          <AcaoLink to="/jogadores">
+            <IconeAcao>
+              <UsersRound size={18} aria-hidden="true" />
+            </IconeAcao>
+            <TextoAcao>
+              <TituloAcao>Gerenciar jogadores</TituloAcao>
+              <DescricaoAcao>Gerencie seu elenco</DescricaoAcao>
+            </TextoAcao>
+          </AcaoLink>
+          <AcaoPrincipal to="/sorteio">
+            <IconeAcao>
+              <Shuffle size={18} aria-hidden="true" />
+            </IconeAcao>
+            <TextoAcao>
+              <TituloAcao>Novo sorteio</TituloAcao>
+              <DescricaoAcao>Times equilibrados</DescricaoAcao>
+            </TextoAcao>
+          </AcaoPrincipal>
+          <AcaoLink to="/partidas">
+            <IconeAcao>
+              <CalendarDays size={18} aria-hidden="true" />
+            </IconeAcao>
+            <TextoAcao>
+              <TituloAcao>Partidas</TituloAcao>
+              <DescricaoAcao>Organize uma rodada</DescricaoAcao>
+            </TextoAcao>
+          </AcaoLink>
+
+          <AcaoLink to="/historico">
+            <IconeAcao>
+              <History size={18} aria-hidden="true" />
+            </IconeAcao>
+            <TextoAcao>
+              <TituloAcao>Histórico</TituloAcao>
+              <DescricaoAcao>Consulte sorteios</DescricaoAcao>
+            </TextoAcao>
+          </AcaoLink>
+        </AcoesGrid>
+      </SecaoAcoes>
+    </Pagina>
+  );
+}

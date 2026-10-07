@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="900" viewBox="0 0 420 900">
+  <rect width="420" height="900" fill="#faf8f5"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="22" y="38" font-size="9" font-weight="700" letter-spacing="1.6" fill="#a07842">PRÓXIMA RODADA</text>
+    <text x="22" y="74" font-size="28" font-weight="700" fill="#302e28">Partidas</text>
+
+    <rect x="20" y="96" width="380" height="80" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="38" y="124" font-size="17" font-weight="700" fill="#302e28">Partida criada</text>
+    <text x="38" y="148" font-size="12" fill="#8d8980">Times copiados do sorteio</text>
+    <rect x="266" y="112" width="116" height="28" rx="14" fill="#e8efe5"/>
+    <text x="324" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#355345">Aguardando início</text>
+
+    <text x="22" y="211" font-size="18" font-weight="700" fill="#302e28">Elencos</text>
+    <rect x="20" y="228" width="380" height="94" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="38" y="254" font-size="15" font-weight="700" fill="#355345">Time 1</text>
+    <text x="38" y="280" font-size="12" fill="#302e28">Cleiton</text>
+    <rect x="326" y="266" width="54" height="20" rx="6" fill="#e9efe7"/>
+    <text x="353" y="280" text-anchor="middle" font-size="9" font-weight="700" fill="#355345">Goleiro</text>
+    <text x="38" y="305" font-size="12" fill="#302e28">Cleberson  ·  Eduardo</text>
+
+    <rect x="20" y="334" width="380" height="94" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="38" y="360" font-size="15" font-weight="700" fill="#355345">Time 2</text>
+    <text x="38" y="386" font-size="12" fill="#302e28">Vinicius</text>
+    <rect x="326" y="372" width="54" height="20" rx="6" fill="#e9efe7"/>
+    <text x="353" y="386" text-anchor="middle" font-size="9" font-weight="700" fill="#355345">Goleiro</text>
+    <text x="38" y="411" font-size="12" fill="#302e28">Jaylton  ·  Denes</text>
+
+    <text x="22" y="465" font-size="18" font-weight="700" fill="#302e28">Configurar jogo</text>
+    <rect x="20" y="482" width="380" height="274" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+
+    <text x="38" y="510" font-size="12" font-weight="700" fill="#302e28">Time A</text>
+    <rect x="38" y="520" width="344" height="44" rx="10" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="52" y="547" font-size="13" fill="#355345">Selecione o primeiro time</text>
+    <path d="M360 538l6 6 6-6" fill="none" stroke="#8d8980" stroke-width="1.6"/>
+
+    <text x="38" y="592" font-size="12" font-weight="700" fill="#302e28">Time B</text>
+    <rect x="38" y="602" width="344" height="44" rx="10" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="52" y="629" font-size="13" fill="#8d8980">Selecione o segundo time</text>
+    <path d="M360 620l6 6 6-6" fill="none" stroke="#8d8980" stroke-width="1.6"/>
+
+    <text x="38" y="674" font-size="12" font-weight="700" fill="#302e28">Duração (minutos)</text>
+    <rect x="38" y="684" width="344" height="44" rx="10" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="52" y="711" font-size="13" fill="#302e28">10</text>
+
+    <rect x="20" y="774" width="380" height="54" rx="11" fill="#355345"/>
+    <text x="210" y="807" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">Criar jogo</text>
+
+    <rect x="0" y="846" width="420" height="54" fill="#ffffff" stroke="#e8e4dc"/>
+    <g fill="#8d8980" font-size="9" text-anchor="middle">
+      <text x="42" y="881">Início</text><text x="126" y="881">Jogadores</text>
+      <text x="210" y="881" fill="#355345" font-weight="700">Sorteio</text>
+      <text x="294" y="881" fill="#355345" font-weight="700">Partidas</text><text x="378" y="881">Histórico</text>
+    </g>
+    <g fill="none" stroke="#8d8980" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M36 858l6-5 6 5v8h-5v-5h-3v5h-4z"/>
+      <circle cx="122" cy="857" r="3"/><circle cx="130" cy="857" r="3"/><path d="M117 866c1-4 8-4 10 0m-1 0c1-4 8-4 10 0"/>
+      <path d="M204 858a7 7 0 0 1 12-3l2 2m0-4v4h-4m2 6a7 7 0 0 1-12 3l-2-2m0 4v-4h4"/>
+      <rect x="288" y="853" width="12" height="13" rx="2" stroke="#355345"/><path d="M291 851v4m6-4v4m-6 3h1m3 0h1m-5 3h1m3 0h1" stroke="#355345"/>
+      <circle cx="378" cy="860" r="7"/><path d="M378 856v4l3 2"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="970" viewBox="0 0 780 970">
+  <rect width="780" height="970" fill="#f0ede7"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <!-- Active game screen -->
+    <rect x="12" y="12" width="366" height="946" rx="22" fill="#faf8f5" stroke="#e3ded4"/>
+    <text x="32" y="51" font-size="9" font-weight="700" letter-spacing="1.4" fill="#a07842">PARTIDA EM ANDAMENTO</text>
+    <text x="32" y="80" font-size="23" font-weight="700" fill="#302e28">Cronômetro e placar</text>
+
+    <rect x="28" y="98" width="334" height="52" rx="12" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="90" y="129" text-anchor="middle" font-size="14" font-weight="700" fill="#355345">Time Verde</text>
+    <text x="195" y="129" text-anchor="middle" font-size="11" font-weight="700" fill="#a07842">VS</text>
+    <text x="300" y="129" text-anchor="middle" font-size="14" font-weight="700" fill="#355345">Time Azul</text>
+
+    <rect x="28" y="164" width="334" height="116" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="195" y="188" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="1.2" fill="#8d8980">PLACAR</text>
+    <text x="134" y="251" text-anchor="middle" font-size="52" font-weight="700" fill="#355345">3</text>
+    <text x="195" y="248" text-anchor="middle" font-size="27" font-weight="700" fill="#b9b2a6">:</text>
+    <text x="256" y="251" text-anchor="middle" font-size="52" font-weight="700" fill="#a07842">2</text>
+
+    <rect x="28" y="294" width="334" height="142" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="195" y="320" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="1.2" fill="#8d8980">TEMPO DECORRIDO</text>
+    <text x="195" y="374" text-anchor="middle" font-size="42" font-weight="700" fill="#302e28" font-variant-numeric="tabular-nums">14:25</text>
+    <text x="195" y="395" text-anchor="middle" font-size="11" fill="#8d8980">Duração: 40 minutos</text>
+    <rect x="42" y="406" width="296" height="1" fill="#f0ede7"/>
+    <rect x="42" y="414" width="135" height="36" rx="8" fill="#355345"/>
+    <text x="109" y="437" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">Pausar</text>
+    <rect x="185" y="414" width="153" height="36" rx="8" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="261" y="437" text-anchor="middle" font-size="12" font-weight="700" fill="#8d554e">Encerrar</text>
+
+    <rect x="28" y="450" width="334" height="146" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="44" y="476" font-size="14" font-weight="700" fill="#302e28">Evento rápido</text>
+    <text x="44" y="494" font-size="10" fill="#8d8980">Escolha o jogador e registre uma ação.</text>
+    <rect x="44" y="506" width="302" height="36" rx="8" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="56" y="529" font-size="11" fill="#8d8980">Selecionar jogador</text>
+    <path d="M319 520l5 5 5-5" fill="none" stroke="#8d8980" stroke-width="1.4"/>
+    <rect x="44" y="552" width="67" height="29" rx="7" fill="#fff8f7" stroke="#ead2ce"/>
+    <text x="78" y="571" text-anchor="middle" font-size="10" font-weight="700" fill="#a34f43">Gol</text>
+    <rect x="118" y="552" width="67" height="29" rx="7" fill="#f5f8f3" stroke="#d9e5d8"/>
+    <text x="151" y="571" text-anchor="middle" font-size="10" font-weight="700" fill="#355345">Assist.</text>
+    <rect x="192" y="552" width="67" height="29" rx="7" fill="#fff8e8" stroke="#ead8a7"/>
+    <text x="225" y="571" text-anchor="middle" font-size="10" font-weight="700" fill="#88651e">Defesa</text>
+    <rect x="266" y="552" width="80" height="29" rx="7" fill="#f6f3ee" stroke="#e8e4dc"/>
+    <text x="306" y="571" text-anchor="middle" font-size="10" font-weight="700" fill="#6e6a61">Desarme</text>
+
+    <rect x="28" y="610" width="334" height="182" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="44" y="637" font-size="14" font-weight="700" fill="#302e28">Escalação</text>
+    <rect x="44" y="651" width="302" height="28" rx="7" fill="#e8efe5"/>
+    <text x="56" y="670" font-size="10" font-weight="700" fill="#355345">TIME VERDE</text>
+    <text x="56" y="701" font-size="11" font-weight="700" fill="#302e28">Arthur Silva</text><text x="329" y="701" text-anchor="end" font-size="9" fill="#8d8980">Fixo</text>
+    <text x="56" y="725" font-size="11" font-weight="700" fill="#302e28">Gabriel Souza</text><text x="329" y="725" text-anchor="end" font-size="9" fill="#8d8980">Pivô</text>
+    <text x="56" y="749" font-size="11" font-weight="700" fill="#302e28">Igor Marques</text><text x="329" y="749" text-anchor="end" font-size="9" fill="#8d8980">Goleiro</text>
+    <line x1="44" y1="762" x2="346" y2="762" stroke="#f0ede7"/>
+    <text x="56" y="782" font-size="10" font-weight="700" fill="#355345">TIME AZUL</text>
+
+    <!-- Finished game screen -->
+    <rect x="402" y="12" width="366" height="946" rx="22" fill="#faf8f5" stroke="#e3ded4"/>
+    <text x="422" y="51" font-size="9" font-weight="700" letter-spacing="1.4" fill="#a07842">PARTIDA ENCERRADA</text>
+    <text x="422" y="80" font-size="23" font-weight="700" fill="#302e28">Fim do jogo</text>
+
+    <rect x="418" y="98" width="334" height="166" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <text x="585" y="125" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="1.2" fill="#355345">RESULTADO FINAL</text>
+    <text x="525" y="188" text-anchor="middle" font-size="48" font-weight="700" fill="#355345">4</text>
+    <text x="585" y="184" text-anchor="middle" font-size="23" font-weight="700" fill="#b9b2a6">x</text>
+    <text x="645" y="188" text-anchor="middle" font-size="48" font-weight="700" fill="#a07842">2</text>
+    <text x="585" y="216" text-anchor="middle" font-size="11" fill="#8d8980">Time Verde venceu · 40 minutos</text>
+
+    <rect x="418" y="280" width="334" height="80" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <circle cx="460" cy="320" r="22" fill="#f5ead4"/>
+    <text x="460" y="325" text-anchor="middle" font-size="12" font-weight="700" fill="#88651e">AS</text>
+    <text x="494" y="313" font-size="12" font-weight="700" fill="#302e28">Arthur Silva</text>
+    <text x="494" y="334" font-size="10" fill="#8d8980">Destaque do jogo · 2 gols</text>
+    <text x="718" y="325" text-anchor="end" font-size="13" fill="#a07842">★ 8.8</text>
+
+    <text x="422" y="394" font-size="16" font-weight="700" fill="#302e28">Eventos da partida</text>
+    <rect x="418" y="407" width="334" height="132" rx="14" fill="#ffffff" stroke="#e8e4dc"/>
+    <circle cx="446" cy="438" r="10" fill="#e8efe5"/><text x="446" y="442" text-anchor="middle" font-size="9" font-weight="700" fill="#355345">G</text>
+    <text x="466" y="437" font-size="11" font-weight="700" fill="#302e28">Arthur Silva · Gol</text><text x="721" y="437" text-anchor="end" font-size="10" fill="#8d8980">12:18</text>
+    <line x1="438" y1="456" x2="732" y2="456" stroke="#f0ede7"/>
+    <circle cx="446" cy="480" r="10" fill="#fff3dc"/><text x="446" y="484" text-anchor="middle" font-size="9" font-weight="700" fill="#88651e">A</text>
+    <text x="466" y="479" font-size="11" font-weight="700" fill="#302e28">Gabriel Souza · Assistência</text><text x="721" y="479" text-anchor="end" font-size="10" fill="#8d8980">12:18</text>
+    <line x1="438" y1="498" x2="732" y2="498" stroke="#f0ede7"/>
+    <circle cx="446" cy="521" r="10" fill="#f6f3ee"/><text x="446" y="525" text-anchor="middle" font-size="9" font-weight="700" fill="#6e6a61">G</text>
+    <text x="466" y="520" font-size="11" font-weight="700" fill="#302e28">Igor Marques · Defesa</text><text x="721" y="520" text-anchor="end" font-size="10" fill="#8d8980">08:41</text>
+
+    <rect x="418" y="555" width="334" height="54" rx="11" fill="#355345"/>
+    <text x="585" y="588" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Avaliar desempenhos</text>
+    <rect x="418" y="621" width="334" height="50" rx="11" fill="#ffffff" stroke="#355345"/>
+    <text x="585" y="651" text-anchor="middle" font-size="12" font-weight="700" fill="#355345">Ver histórico da partida</text>
+    <text x="585" y="700" text-anchor="middle" font-size="9" fill="#8d8980">Avaliações e histórico seguem disponíveis depois.</text>
+
+    <!-- Six-item app navigation -->
+    <rect x="12" y="846" width="366" height="112" rx="0 0 22 22" fill="#ffffff" stroke="#e8e4dc"/>
+    <rect x="402" y="846" width="366" height="112" rx="0 0 22 22" fill="#ffffff" stroke="#e8e4dc"/>
+    <g font-size="8" text-anchor="middle">
+      <text x="42" y="903" fill="#8d8980">Início</text><text x="102" y="903" fill="#8d8980">Jogadores</text><text x="162" y="903" fill="#8d8980">Sorteio</text><text x="222" y="903" fill="#8d8980">Partidas</text><text x="282" y="903" fill="#355345" font-weight="700">Jogo</text><text x="348" y="903" fill="#8d8980">Histórico</text>
+      <text x="432" y="903" fill="#8d8980">Início</text><text x="492" y="903" fill="#8d8980">Jogadores</text><text x="552" y="903" fill="#8d8980">Sorteio</text><text x="612" y="903" fill="#8d8980">Partidas</text><text x="672" y="903" fill="#355345" font-weight="700">Jogo</text><text x="738" y="903" fill="#8d8980">Histórico</text>
+    </g>
+    <g fill="none" stroke="#8d8980" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M37 877l5-4 5 4v7h-4v-4h-2v4h-4z"/><circle cx="99" cy="876" r="2.4"/><circle cx="105" cy="876" r="2.4"/><path d="M95 884c1-4 6-4 8 0m-1 0c1-4 6-4 8 0"/><path d="M159 877a5 5 0 0 1 9-2l2 2m0-4v4h-4m2 4a5 5 0 0 1-9 2l-2-2m0 4v-4h4"/><rect x="217" y="873" width="10" height="11" rx="2"/><path d="M219 871v4m5-4v4"/>
+      <path d="M279 875v9l7-4.5z" stroke="#355345" fill="#355345"/><circle cx="345" cy="879" r="5"/><path d="M345 876v3l2 1"/>
+      <path d="M427 877l5-4 5 4v7h-4v-4h-2v4h-4z"/><circle cx="489" cy="876" r="2.4"/><circle cx="495" cy="876" r="2.4"/><path d="M485 884c1-4 6-4 8 0m-1 0c1-4 6-4 8 0"/><path d="M549 877a5 5 0 0 1 9-2l2 2m0-4v4h-4m2 4a5 5 0 0 1-9 2l-2-2m0 4v-4h4"/><rect x="607" y="873" width="10" height="11" rx="2"/><path d="M609 871v4m5-4v4"/>
+      <path d="M669 875v9l7-4.5z" stroke="#355345" fill="#355345"/><circle cx="735" cy="879" r="5"/><path d="M735 876v3l2 1"/>
+    </g>
+  </g>
+</svg>

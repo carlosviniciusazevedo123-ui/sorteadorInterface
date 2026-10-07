@@ -1,0 +1,42 @@
+.registration-story .story-content h1 { max-width: 440px; font-size: clamp(36px, 3.8vw, 50px); }
+.registration-art { position: relative; display: grid; min-height: 245px; place-items: center; margin-top: 17px; }
+.registration-art::before, .registration-art::after { position: absolute; width: 218px; height: 218px; border: 1px solid rgb(255 255 255 / 11%); border-radius: 50%; content: ''; }
+.registration-art::after { width: 166px; height: 166px; border-style: dashed; border-color: rgb(255 255 255 / 16%); }
+.registration-ticket { z-index: 1; width: min(100%, 350px); padding: 20px 21px 18px; border: 1px solid #ece9df; border-radius: 15px; background: #fbfaf6; box-shadow: 0 18px 48px rgb(20 34 25 / 20%); transform: rotate(-3deg); }
+.registration-ticket-label, .registration-ticket-caption { display: block; color: #827d70; font-size: 9px; font-weight: 700; letter-spacing: 1.45px; }
+.registration-balls { display: flex; justify-content: space-between; gap: 10px; margin: 18px 0; }
+.registration-balls span { display: grid; width: 65px; height: 65px; place-items: center; border-radius: 50%; background: #f8e9dd; color: #d86b3c; font-family: 'Manrope', sans-serif; font-size: 21px; font-weight: 800; }
+.registration-balls span:nth-child(2) { background: #e8efdd; color: #587447; }
+.registration-balls span:nth-child(3) { background: #f7edc9; color: #9b7925; }
+.registration-ticket-caption { padding-top: 13px; border-top: 1px dashed #ddd8cc; color: #a19c90; font-size: 9px; font-weight: 500; letter-spacing: .2px; }
+.registration-spark { position: absolute; z-index: 2; }
+.registration-spark-one { top: 27px; right: 13%; color: #e6bd6d; font-size: 30px; }
+.registration-spark-two { bottom: 25px; left: 12%; color: #e87b52; font-size: 24px; }
+.registration-card { padding-top: 34px; padding-bottom: 34px; }
+.registration-heading { margin-bottom: 22px; }
+.registration-heading h2 { margin-top: 10px; font-size: 31px; }
+.registration-label { margin-top: 14px; }
+.registration-form .input-icon { width: 42px; font-size: 14px; font-weight: 600; }
+.registration-form .input-wrap input { font-size: 12px; }
+.registration-form .toggle-password { width: auto; padding: 0 11px; color: #587447; font-size: 10px; font-weight: 600; }
+.registration-form .form-error { margin-top: 15px; margin-bottom: 0; }
+.registration-submit { margin-top: 20px; }
+.registration-login-note { margin-top: 19px; }
+.registration-page .secure-note { margin-top: 22px; padding-top: 14px; }
+.registration-panel .login-card { width: min(100%, 405px); }
+.registration-panel .welcome-card { padding: 26px; }
+
+@media (max-width: 850px) {
+  .registration-art { min-height: 210px; }
+  .registration-story .story-content h1 { font-size: 40px; }
+  .registration-ticket { width: min(100%, 310px); }
+}
+
+@media (max-width: 640px) {
+  .registration-panel .login-card { width: min(100%, 405px); }
+  .registration-card { padding-top: 28px; padding-bottom: 28px; }
+  .registration-heading { margin-bottom: 20px; }
+  .registration-heading h2 { font-size: 30px; }
+  .registration-label { margin-top: 13px; }
+  .registration-page .secure-note { margin-top: 18px; }
+}
