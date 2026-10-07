@@ -60,8 +60,10 @@ export function Partidas() {
 
   const [jogadores, setJogadores] = useState([]);
   const [carregandoJogadores, setCarregandoJogadores] = useState(true);
-  const [timeAId, setTimeAId] = useState('');
-  const [timeBId, setTimeBId] = useState('');
+  const [selecaoTimeA, setSelecaoTimeA] = useState({ drawId, id: '' });
+  const [selecaoTimeB, setSelecaoTimeB] = useState({ drawId, id: '' });
+  const timeAId = selecaoTimeA.drawId === drawId ? selecaoTimeA.id : '';
+  const timeBId = selecaoTimeB.drawId === drawId ? selecaoTimeB.id : '';
   const [duracaoJogo, setDuracaoJogo] = useState(10);
   const [criandoPartida, setCriandoPartida] = useState(false);
   const [erro, setErro] = useState('');
@@ -82,11 +84,6 @@ export function Partidas() {
 
     carregarJogadores();
   }, []);
-
-  useEffect(() => {
-    setTimeAId('');
-    setTimeBId('');
-  }, [drawId]);
 
   const jogadoresPorId = useMemo(
     () => new Map(jogadores.map((jogador) => [jogador.id, jogador])),
@@ -186,7 +183,9 @@ export function Partidas() {
               Time A
               <SelecaoConfiguracaoJogo
                 value={timeAId}
-                onChange={(event) => setTimeAId(event.target.value)}
+                onChange={(event) =>
+                  setSelecaoTimeA({ drawId, id: event.target.value })
+                }
               >
                 <option value="">Selecione o primeiro time</option>
                 {timesSorteados.map((time, indice) => (
@@ -201,7 +200,9 @@ export function Partidas() {
               Time B
               <SelecaoConfiguracaoJogo
                 value={timeBId}
-                onChange={(event) => setTimeBId(event.target.value)}
+                onChange={(event) =>
+                  setSelecaoTimeB({ drawId, id: event.target.value })
+                }
               >
                 <option value="">Selecione o segundo time</option>
                 {timesSorteados.map((time, indice) => (

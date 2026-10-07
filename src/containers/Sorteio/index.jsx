@@ -114,7 +114,10 @@ export function Sorteio() {
         times: respostaDraw.teams,
         participacoes: resultado,
       };
-      sessionStorage.setItem('sorteador.drawAtual', JSON.stringify(sorteioConcluido));
+      sessionStorage.setItem(
+        'sorteador.drawAtual',
+        JSON.stringify(sorteioConcluido)
+      );
       setResultadoSorteio(sorteioConcluido);
     } catch (error) {
       console.error('Erro ao sortear:', error.response?.data ?? error);
