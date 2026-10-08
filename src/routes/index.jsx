@@ -18,11 +18,7 @@ import { Login } from '../containers/Login';
 import { Menu } from '../containers/Menu';
 import { Partidas } from '../containers/Partidas';
 import { Sorteio } from '../containers/Sorteio';
-function RotaProtegida({ children }) {
-  const token = localStorage.getItem('sorteador.token');
-
-  return token ? children : <Navigate to="/login" replace />;
-}
+import { RotaProtegida } from '../middleware/RotaProtegida';
 
 export function Rotas() {
   const navigate = useNavigate();
