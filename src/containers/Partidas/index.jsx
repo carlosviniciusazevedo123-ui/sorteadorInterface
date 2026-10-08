@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { api } from '../../services/api';
+import { formatarNome } from '../../utils/formatarNome';
+import { mensagemDoErro } from '../../utils/mensagemDoErro';
 import {
   PaginaJogadores as PaginaPartidas,
   EyebrowJogadores,
@@ -22,23 +24,6 @@ import {
 } from './styles';
 
 const CHAVE_DRAW_ATUAL = 'sorteador.drawAtual';
-
-function formatarNome(nome = '') {
-  return nome
-    .trim()
-    .toLocaleLowerCase('pt-BR')
-    .replace(/(^|[\s'-])\p{L}/gu, (parte) => parte.toLocaleUpperCase('pt-BR'));
-}
-
-function mensagemDoErro(error, padrao) {
-  const mensagem = error.response?.data?.error;
-
-  return Array.isArray(mensagem)
-    ? mensagem.join(' ')
-    : typeof mensagem === 'string'
-      ? mensagem
-      : padrao;
-}
 
 function recuperarDraw() {
   try {

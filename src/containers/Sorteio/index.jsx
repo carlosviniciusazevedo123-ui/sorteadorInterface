@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
-import { api } from '../../services/api';
+import { useJogadores } from '../../hooks/useJogadores';
+import { useSorteio } from '../../hooks/useSorteio';
+import { formatarNome } from '../../utils/formatarNome';
 import {
   PaginaJogadores as PaginaSorteio,
   EyebrowJogadores,
@@ -45,121 +46,33 @@ import {
 } from './styles';
 
 export function Sorteio() {
-  const [jogadores, setJogadores] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState('');
-  const [jogadoresSelecionados, setJogadoresSelecionados] = useState([]);
-  const [busca, setBusca] = useState('');
-
-  const [quantidadeTimes, setQuantidadeTimes] = useState(2);
-  const [jogadoresPorTime, setJogadoresPorTime] = useState(4);
-  const [temReserva, setTemReserva] = useState(false);
-  const [reservasPorTime, setReservasPorTime] = useState(1);
-  const [considerarGoleiros, setConsiderarGoleiros] = useState(true);
-
-  const [sorteando, setSorteando] = useState(false);
-  const [resultadoSorteio, setResultadoSorteio] = useState(null);
+  const { jogadores, carregando, erro: erroCarregamento } = useJogadores();
+  const {
+    jogadoresSelecionados,
+    busca,
+    setBusca,
+    quantidadeTimes,
+    setQuantidadeTimes,
+    jogadoresPorTime,
+    setJogadoresPorTime,
+    temReserva,
+    setTemReserva,
+    reservasPorTime,
+    setReservasPorTime,
+    considerarGoleiros,
+    setConsiderarGoleiros,
+    sorteando,
+    resultadoSorteio,
+    setResultadoSorteio,
+    erro,
+    jogadoresFiltrados,
+    alternarSelecao,
+    handleSortear,
+  } = useSorteio(jogadores);
 
   const navigate = useNavigate();
 
-  function alternarSelecao(id) {
-    setJogadoresSelecionados((selecionados) =>
-      selecionados.includes(id)
-        ? selecionados.filter((jogadorId) => jogadorId !== id)
-        : [...selecionados, id]
-    );
-  }
-
-  function formatarNome(nome) {
-    return nome
-      .trim()
-      .toLocaleLowerCase('pt-BR')
-      .replace(/(^|[\s'-])\p{L}/gu, (parte) =>
-        parte.toLocaleUpperCase('pt-BR')
-      );
-  }
-
-  async function handleSortear() {
-    if (jogadoresSelecionados.length === 0) {
-      setErro('Selecione pelo menos um jogador.');
-      return;
-    }
-
-    setErro('');
-    setResultadoSorteio(null);
-    setSorteando(true);
-
-    try {
-      console.log('Iniciando sorteio');
-
-      const { data: respostaDraw } = await api.post('/draws', {
-        howManyTeams: quantidadeTimes,
-        playersPerTeam: jogadoresPorTime,
-        hasReserve: temReserva,
-        reservePerTeam: temReserva ? reservasPorTime : 0,
-        considerGoalkeepers: considerarGoleiros,
-      });
-
-      console.log('Draw criado:', respostaDraw);
-
-      const drawId = respostaDraw.draw.id;
-
-      const { data: resultado } = await api.post(`/draws/${drawId}/draw`, {
-        playerIds: jogadoresSelecionados,
-      });
-
-      console.log('Resultado do sorteio:', resultado);
-      const jogadoresDoSorteio = jogadores.filter((jogador) =>
-        jogadoresSelecionados.includes(jogador.id)
-      );
-      const sorteioConcluido = {
-        drawId,
-        times: respostaDraw.teams,
-        participacoes: resultado,
-        jogadores: jogadoresDoSorteio,
-      };
-      sessionStorage.setItem(
-        'sorteador.drawAtual',
-        JSON.stringify(sorteioConcluido)
-      );
-      setResultadoSorteio(sorteioConcluido);
-    } catch (error) {
-      console.error('Erro ao sortear:', error.response?.data ?? error);
-
-      const mensagem = error.response?.data?.error;
-
-      setErro(
-        Array.isArray(mensagem)
-          ? mensagem.join(' ')
-          : typeof mensagem === 'string'
-            ? mensagem
-            : 'Não foi possível realizar o sorteio.'
-      );
-    } finally {
-      setSorteando(false);
-    }
-  }
-
-  const termoBusca = busca.trim().toLocaleLowerCase('pt-BR');
-
-  const jogadoresFiltrados = jogadores.filter((jogador) =>
-    jogador.name.toLocaleLowerCase('pt-BR').includes(termoBusca)
-  );
-
-  useEffect(() => {
-    async function carregarJogadores() {
-      try {
-        const { data } = await api.get('/players');
-        setJogadores(data);
-      } catch {
-        setErro('Não foi possível carregar os jogadores.');
-      } finally {
-        setCarregando(false);
-      }
-    }
-
-    carregarJogadores();
-  }, []);
+  const erroExibido = erro || erroCarregamento;
 
   return (
     <PaginaSorteio>
@@ -178,13 +91,13 @@ export function Sorteio() {
       </DescricaoJogadores>
 
       {carregando && <p role="status">Carregando jogadores...</p>}
-      {erro && <p role="alert">{erro}</p>}
+      {erroExibido && <p role="alert">{erroExibido}</p>}
 
-      {!carregando && !erro && jogadores.length === 0 && (
+      {!carregando && !erroExibido && jogadores.length === 0 && (
         <p>Cadastre jogadores antes de preparar um sorteio.</p>
       )}
 
-      {!carregando && jogadores.length > 0 && (
+      {!carregando && !erroExibido && jogadores.length > 0 && (
         <SecaoSelecao>
           {!resultadoSorteio && (
             <>

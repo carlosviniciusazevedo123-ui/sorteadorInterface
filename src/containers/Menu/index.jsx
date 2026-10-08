@@ -1,8 +1,10 @@
 import { UsersRound, Shuffle, CalendarDays, History } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { api } from '../../services/api';
+import { useJogadores } from '../../hooks/useJogadores';
+import { usePartidas } from '../../hooks/usePartidas';
+import { limparSessao, obterUsuario } from '../../services/session';
 import {
   Cabecalho,
   PerfilUsuario,
@@ -37,20 +39,18 @@ import {
 } from './styles';
 
 export function Menu() {
-  const [matches, setMatches] = useState([]);
-  const [players, setPlayers] = useState([]);
-  const [carregandoJogadores, setCarregandoJogadores] = useState(true);
-  const [erroJogadores, setErroJogadores] = useState(null);
-  const [carregandoPartidas, setCarregandoPartidas] = useState(true);
-  const [erroPartidas, setErroPartidas] = useState(null);
+  const {
+    jogadores: players,
+    carregando: carregandoJogadores,
+    erro: erroJogadores,
+  } = useJogadores();
+  const {
+    partidas: matches,
+    carregando: carregandoPartidas,
+    erro: erroPartidas,
+  } = usePartidas();
 
-  const [usuario] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('sorteador.user') || 'null');
-    } catch {
-      return null;
-    }
-  });
+  const [usuario] = useState(obterUsuario);
 
   const primeiroNome = usuario?.name?.trim().split(/\s+/)[0] || 'por aí';
   const primeiroNomeFormatado =
@@ -65,41 +65,10 @@ export function Menu() {
       .join('')
       .toUpperCase() || 'VS';
 
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await api.get('/players');
-        setPlayers(response.data);
-      } catch (error) {
-        setErroJogadores(error.message || 'Não foi possível carregar');
-      } finally {
-        setCarregandoJogadores(false);
-      }
-    };
-
-    fetchPlayers();
-  }, []);
-
-  useEffect(() => {
-    const fetchMatches = async () => {
-      try {
-        const response = await api.get('/matches');
-        setMatches(response.data);
-      } catch (error) {
-        setErroPartidas(error.message || 'Não foi possível carregar');
-      } finally {
-        setCarregandoPartidas(false);
-      }
-    };
-
-    fetchMatches();
-  }, []);
-
   const navigate = useNavigate();
 
   function handleLogout() {
-    localStorage.removeItem('sorteador.token');
-    localStorage.removeItem('sorteador.user');
+    limparSessao();
     navigate('/login', { replace: true });
   }
 

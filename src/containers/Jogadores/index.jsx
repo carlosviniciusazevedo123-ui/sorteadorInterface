@@ -1,6 +1,7 @@
 import { Trash2, Pencil } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
+import { useJogadores } from '../../hooks/useJogadores';
 import { api } from '../../services/api';
 import {
   PaginaJogadores,
@@ -20,27 +21,9 @@ import {
 } from './styles';
 
 export function Jogadores() {
-  const [jogadores, setJogadores] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState('');
+  const { jogadores, carregando, erro, removerJogador } = useJogadores();
   const [erroExclusao, setErroExclusao] = useState('');
   const [idExcluindo, setIdExcluindo] = useState(null);
-
-  useEffect(() => {
-    async function carregarJogadores() {
-      try {
-        const { data } = await api.get('/players');
-        setJogadores(data);
-      } catch (error) {
-        console.error(error);
-        setErro('Não foi possível carregar os jogadores.');
-      } finally {
-        setCarregando(false);
-      }
-    }
-
-    carregarJogadores();
-  }, []);
 
   async function excluirJogador(jogador) {
     if (!window.confirm(`Deseja excluir ${jogador.name}?`)) return;
@@ -50,7 +33,7 @@ export function Jogadores() {
 
     try {
       await api.delete(`/players/${jogador.id}`);
-      setJogadores((atuais) => atuais.filter((item) => item.id !== jogador.id));
+      removerJogador(jogador.id);
     } catch (error) {
       setErroExclusao(
         error.response?.status === 409

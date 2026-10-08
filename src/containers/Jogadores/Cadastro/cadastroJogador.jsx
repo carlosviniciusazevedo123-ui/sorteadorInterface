@@ -2,23 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { api } from '../../../services/api';
+import { mensagemErroJogador } from '../../../utils/mensagemErroJogador';
 import {
   PaginaJogadores,
   TituloJogadores,
   EyebrowJogadores,
   DescricaoJogadores,
 } from '../styles';
-import {
-  LinkVoltarJogadores,
-  CartaoFormularioJogador,
-  CampoJogador,
-  LabelJogador,
-  InputJogador,
-  LinhaCheckbox,
-  CheckboxJogador,
-  ErroCadastroJogador,
-  BotaoSalvarJogador,
-} from './styles';
+import { FormularioJogador } from './FormularioJogador';
+import { LinkVoltarJogadores } from './styles';
 
 export function CadastroJogador() {
   const [nome, setNome] = useState('');
@@ -50,12 +42,11 @@ export function CadastroJogador() {
 
       navigate('/jogadores', { replace: true });
     } catch (error) {
-      const erroBackend = error.response?.data?.error;
-
       setErroCadastro(
-        erroBackend === 'A player with this name already exists'
-          ? 'Já existe um jogador com esse nome.'
-          : 'Não foi possível cadastrar o jogador. Confira os campos e tente novamente.'
+        mensagemErroJogador(
+          error,
+          'Não foi possível cadastrar o jogador. Confira os campos e tente novamente.'
+        )
       );
     } finally {
       setSalvando(false);
@@ -72,61 +63,21 @@ export function CadastroJogador() {
       <DescricaoJogadores>
         Preencha os dados para incluir alguém no seu elenco.
       </DescricaoJogadores>
-      <CartaoFormularioJogador onSubmit={handleSubmit}>
-        <CampoJogador>
-          <LabelJogador htmlFor="nome">Nome do jogador</LabelJogador>
-          <InputJogador
-            id="nome"
-            name="name"
-            type="text"
-            value={nome}
-            onChange={(event) => setNome(event.target.value)}
-            required
-          />
-        </CampoJogador>
-        <CampoJogador>
-          <LabelJogador htmlFor="posicao">Posição</LabelJogador>
-          <InputJogador
-            id="posicao"
-            name="position"
-            type="text"
-            value={posicao}
-            onChange={(event) => setPosicao(event.target.value)}
-            placeholder="Ex.: Ala"
-          />
-        </CampoJogador>
-        <LinhaCheckbox>
-          <CheckboxJogador
-            type="checkbox"
-            name="is_goalkeeper"
-            checked={ehGoleiro}
-            onChange={(event) => setEhGoleiro(event.target.checked)}
-          />
-          É goleiro
-        </LinhaCheckbox>
-        <CampoJogador>
-          <LabelJogador htmlFor="nota">Avaliação geral (0 a 10)</LabelJogador>
-          <InputJogador
-            id="nota"
-            name="overall_rating"
-            type="number"
-            min="0"
-            max="10"
-            step="0.1"
-            value={nota}
-            onChange={(event) => setNota(event.target.value)}
-            required
-            placeholder="Ex.: 7.5"
-          />
-        </CampoJogador>
-        {erroCadastro && (
-          <ErroCadastroJogador role="alert">{erroCadastro}</ErroCadastroJogador>
-        )}
-
-        <BotaoSalvarJogador type="submit" disabled={salvando}>
-          {salvando ? 'Salvando...' : 'Cadastrar jogador'}
-        </BotaoSalvarJogador>
-      </CartaoFormularioJogador>
+      <FormularioJogador
+        nome={nome}
+        onNomeChange={setNome}
+        posicao={posicao}
+        onPosicaoChange={setPosicao}
+        ehGoleiro={ehGoleiro}
+        onEhGoleiroChange={setEhGoleiro}
+        nota={nota}
+        onNotaChange={setNota}
+        exibirNota
+        erro={erroCadastro}
+        salvando={salvando}
+        textoBotao="Cadastrar jogador"
+        onSubmit={handleSubmit}
+      />
     </PaginaJogadores>
   );
 }

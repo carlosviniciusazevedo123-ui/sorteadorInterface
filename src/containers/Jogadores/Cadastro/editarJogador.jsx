@@ -2,17 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
 import { api } from '../../../services/api';
+import { mensagemErroJogador } from '../../../utils/mensagemErroJogador';
 import { PaginaJogadores, TituloJogadores } from '../styles';
-import {
-  CartaoFormularioJogador,
-  CampoJogador,
-  LabelJogador,
-  InputJogador,
-  LinhaCheckbox,
-  CheckboxJogador,
-  LinkVoltarJogadores,
-  BotaoSalvarJogador,
-} from './styles';
+import { FormularioJogador } from './FormularioJogador';
+import { LinkVoltarJogadores } from './styles';
 
 export function EditarJogador() {
   const { id } = useParams();
@@ -67,12 +60,8 @@ export function EditarJogador() {
 
       navigate('/jogadores', { replace: true });
     } catch (error) {
-      const erroBackend = error.response?.data?.error;
-
       setErro(
-        erroBackend === 'A player with this name already exists'
-          ? 'Já existe um jogador com esse nome.'
-          : 'Não foi possível salvar as alterações.'
+        mensagemErroJogador(error, 'Não foi possível salvar as alterações.')
       );
     } finally {
       setSalvando(false);
@@ -88,45 +77,20 @@ export function EditarJogador() {
       <TituloJogadores>Editar jogador</TituloJogadores>
 
       {carregando && <p>Carregando jogador...</p>}
-      {erro && <p role="alert">{erro}</p>}
+      {erro && !jogador && <p role="alert">{erro}</p>}
       {jogador && (
-        <CartaoFormularioJogador onSubmit={handleSubmit}>
-          <CampoJogador>
-            <LabelJogador htmlFor="nome">Nome do jogador</LabelJogador>
-            <InputJogador
-              id="nome"
-              name="name"
-              value={nome}
-              onChange={(event) => setNome(event.target.value)}
-              required
-            />
-          </CampoJogador>
-
-          <CampoJogador>
-            <LabelJogador htmlFor="posicao">Posição</LabelJogador>
-            <InputJogador
-              id="posicao"
-              name="position"
-              value={posicao}
-              onChange={(event) => setPosicao(event.target.value)}
-              placeholder="Ex.: Ala"
-            />
-          </CampoJogador>
-
-          <LinhaCheckbox>
-            <CheckboxJogador
-              type="checkbox"
-              name="is_goalkeeper"
-              checked={ehGoleiro}
-              onChange={(event) => setEhGoleiro(event.target.checked)}
-            />
-            É goleiro
-          </LinhaCheckbox>
-
-          <BotaoSalvarJogador type="submit" disabled={salvando}>
-            {salvando ? 'Salvando...' : 'Salvar alterações'}
-          </BotaoSalvarJogador>
-        </CartaoFormularioJogador>
+        <FormularioJogador
+          nome={nome}
+          onNomeChange={setNome}
+          posicao={posicao}
+          onPosicaoChange={setPosicao}
+          ehGoleiro={ehGoleiro}
+          onEhGoleiroChange={setEhGoleiro}
+          erro={erro}
+          salvando={salvando}
+          textoBotao="Salvar alterações"
+          onSubmit={handleSubmit}
+        />
       )}
     </PaginaJogadores>
   );

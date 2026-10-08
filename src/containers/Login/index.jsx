@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { api } from '../../services/api';
+import { obterUsuario, salvarSessao } from '../../services/session';
 import './styles.css';
 
 const SAVED_EMAIL_KEY = 'sorteador.email';
@@ -161,12 +162,7 @@ export function Login({ onRegister, onLoginSuccess, initialEmail = '' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(() => {
-    try {
-      const savedUser = localStorage.getItem('sorteador.user');
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch {
-      return null;
-    }
+    return obterUsuario();
   });
 
   async function handleSubmit(event) {
@@ -190,14 +186,11 @@ export function Login({ onRegister, onLoginSuccess, initialEmail = '' }) {
           'A resposta do servidor não trouxe um token de acesso.'
         );
 
-      localStorage.setItem('sorteador.token', data.token);
-      localStorage.setItem(
-        'sorteador.user',
-        JSON.stringify({ id: data.id, name: data.name, email: data.email })
-      );
+      const usuario = { id: data.id, name: data.name, email: data.email };
+      salvarSessao(data.token, usuario);
       if (remember) localStorage.setItem(SAVED_EMAIL_KEY, email.trim());
       else localStorage.removeItem(SAVED_EMAIL_KEY);
-      setUser(data);
+      setUser(usuario);
     } catch (requestError) {
       const status = requestError.response?.status;
       const backendError = requestError.response?.data?.error;

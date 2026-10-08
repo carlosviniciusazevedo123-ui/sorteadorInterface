@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
-import { api } from '../../services/api';
+import { usePartidas } from '../../hooks/usePartidas';
 import {
   PaginaJogadores as PaginaHistorico,
   EyebrowJogadores,
@@ -26,10 +26,6 @@ const statusEmPortugues = {
   paused: 'Pausada',
   finished: 'Finalizada',
 };
-
-function obterObjeto(resposta) {
-  return resposta?.match ?? resposta;
-}
 
 function formatarData(data) {
   if (!data) return 'Data não informada';
@@ -67,68 +63,17 @@ function obterConfronto(partida, jogo) {
   };
 }
 
-function mensagemDoErro(error) {
-  const mensagem = error.response?.data?.error;
-
-  return Array.isArray(mensagem)
-    ? mensagem.join(' ')
-    : typeof mensagem === 'string'
-      ? mensagem
-      : 'Não foi possível carregar o histórico.';
-}
-
 export function Historico() {
-  const [partidas, setPartidas] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState('');
-
-  useEffect(() => {
-    let ativo = true;
-
-    async function carregarHistorico() {
-      try {
-        const { data } = await api.get('/matches');
-        const lista = Array.isArray(data) ? data : data?.matches || [];
-
-        const partidasComDetalhes = await Promise.all(
-          lista.map(async (partida) => {
-            if (partida.teams?.length && partida.games?.length) {
-              return partida;
-            }
-
-            try {
-              const { data: detalhes } = await api.get(
-                `/matches/${partida.id}`
-              );
-              return obterObjeto(detalhes);
-            } catch {
-              return partida;
-            }
-          })
-        );
-
-        if (ativo) {
-          setPartidas(
-            partidasComDetalhes.sort((a, b) => {
-              const dataA = new Date(a.finished_at || a.createdAt || 0);
-              const dataB = new Date(b.finished_at || b.createdAt || 0);
-              return dataB - dataA;
-            })
-          );
-        }
-      } catch (error) {
-        if (ativo) setErro(mensagemDoErro(error));
-      } finally {
-        if (ativo) setCarregando(false);
-      }
-    }
-
-    carregarHistorico();
-
-    return () => {
-      ativo = false;
-    };
-  }, []);
+  const { partidas, carregando, erro } = usePartidas({ incluirDetalhes: true });
+  const partidasOrdenadas = useMemo(
+    () =>
+      [...partidas].sort((a, b) => {
+        const dataA = new Date(a.finished_at || a.createdAt || 0);
+        const dataB = new Date(b.finished_at || b.createdAt || 0);
+        return dataB - dataA;
+      }),
+    [partidas]
+  );
 
   return (
     <PaginaHistorico>
@@ -144,16 +89,16 @@ export function Historico() {
 
       {erro && <ErroHistorico role="alert">{erro}</ErroHistorico>}
 
-      {!carregando && !erro && partidas.length === 0 && (
+      {!carregando && !erro && partidasOrdenadas.length === 0 && (
         <EstadoHistorico>
           <strong>Nenhuma partida por aqui ainda</strong>
           <span>Quando você jogar, os confrontos vão aparecer nesta tela.</span>
         </EstadoHistorico>
       )}
 
-      {!carregando && partidas.length > 0 && (
+      {!carregando && partidasOrdenadas.length > 0 && (
         <ListaHistorico>
-          {partidas.map((partida) => {
+          {partidasOrdenadas.map((partida) => {
             const jogos = partida.games || [];
             const jogo = jogos[0];
             const confronto = obterConfronto(partida, jogo);

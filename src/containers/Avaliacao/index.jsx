@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { api } from '../../services/api';
+import { mensagemDoErro } from '../../utils/mensagemDoErro';
 import {
   PaginaAvaliacao,
   CartaoAvaliacao,
@@ -20,16 +21,6 @@ const criterios = [
   ['speed', 'Velocidade'],
   ['decision_making', 'Tomada de decisão'],
 ];
-
-function mensagemDoErro(error, padrao) {
-  const mensagem = error.response?.data?.error;
-
-  return Array.isArray(mensagem)
-    ? mensagem.join(' ')
-    : typeof mensagem === 'string'
-      ? mensagem
-      : padrao;
-}
 
 function notasIniciais() {
   return Object.fromEntries(criterios.map(([campo]) => [campo, 5]));

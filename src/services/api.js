@@ -1,11 +1,13 @@
 import axios from 'axios';
 
+import { obterToken } from './session';
+
 export const api = axios.create({
   baseURL: '/api',
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('sorteador.token');
+  const token = obterToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
