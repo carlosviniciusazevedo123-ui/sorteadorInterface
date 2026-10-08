@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { api } from '../../services/api';
@@ -14,7 +14,6 @@ import {
   CartaoTimePartida,
   ListaJogadoresPartida,
   ItemJogadorPartida,
-  MensagemEstadoPartida,
   MensagemErroPartida,
   ListaTimesPartida,
   CampoConfiguracaoJogo,
@@ -58,8 +57,7 @@ export function Partidas() {
   const participacoes =
     location.state?.participacoes || draw?.participacoes || [];
 
-  const [jogadores, setJogadores] = useState([]);
-  const [carregandoJogadores, setCarregandoJogadores] = useState(true);
+  const jogadores = location.state?.jogadores || draw?.jogadores || [];
   const [selecaoTimeA, setSelecaoTimeA] = useState({ drawId, id: '' });
   const [selecaoTimeB, setSelecaoTimeB] = useState({ drawId, id: '' });
   const timeAId = selecaoTimeA.drawId === drawId ? selecaoTimeA.id : '';
@@ -67,23 +65,6 @@ export function Partidas() {
   const [duracaoJogo, setDuracaoJogo] = useState(10);
   const [criandoPartida, setCriandoPartida] = useState(false);
   const [erro, setErro] = useState('');
-
-  useEffect(() => {
-    async function carregarJogadores() {
-      try {
-        const { data } = await api.get('/players');
-        setJogadores(data);
-      } catch (error) {
-        setErro(
-          mensagemDoErro(error, 'Não foi possível carregar os jogadores.')
-        );
-      } finally {
-        setCarregandoJogadores(false);
-      }
-    }
-
-    carregarJogadores();
-  }, []);
 
   const jogadoresPorId = useMemo(
     () => new Map(jogadores.map((jogador) => [jogador.id, jogador])),
@@ -155,13 +136,7 @@ export function Partidas() {
       </DescricaoJogadores>
 
       {erro && <MensagemErroPartida role="alert">{erro}</MensagemErroPartida>}
-      {carregandoJogadores && (
-        <MensagemEstadoPartida role="status">
-          Carregando jogadores...
-        </MensagemEstadoPartida>
-      )}
-
-      {!drawId && !carregandoJogadores && (
+      {!drawId && (
         <CartaoCriacaoPartida>
           <h2>Nenhum sorteio disponível</h2>
           <p>Faça um sorteio para escolher os times deste confronto.</p>
@@ -171,7 +146,7 @@ export function Partidas() {
         </CartaoCriacaoPartida>
       )}
 
-      {drawId && !carregandoJogadores && (
+      {drawId && (
         <>
           <CartaoCriacaoPartida>
             <h2>Escolha os times</h2>

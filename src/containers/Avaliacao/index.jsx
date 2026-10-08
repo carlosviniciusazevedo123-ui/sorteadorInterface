@@ -56,7 +56,9 @@ export function Avaliacao() {
         setExpiraEm(data.expires_at || '');
         setLinkValidado(true);
       } catch (error) {
-        setErro(mensagemDoErro(error, 'Este link de avaliação é inválido ou expirou.'));
+        setErro(
+          mensagemDoErro(error, 'Este link de avaliação é inválido ou expirou.')
+        );
       } finally {
         setCarregando(false);
       }
@@ -90,7 +92,12 @@ export function Avaliacao() {
       setNotas(notasIniciais());
       if (!data.players?.length) setConcluida(true);
     } catch (error) {
-      setErro(mensagemDoErro(error, 'Não foi possível identificar você nesta partida.'));
+      setErro(
+        mensagemDoErro(
+          error,
+          'Não foi possível identificar você nesta partida.'
+        )
+      );
     } finally {
       setEnviando(false);
     }
@@ -130,8 +137,14 @@ export function Avaliacao() {
         <span>Este link fica disponível até {horarioExpiracao}.</span>
       )}
 
-      {carregando && <MensagemAvaliacao role="status">Validando link...</MensagemAvaliacao>}
-      {erro && <MensagemAvaliacao $erro role="alert">{erro}</MensagemAvaliacao>}
+      {carregando && (
+        <MensagemAvaliacao role="status">Validando link...</MensagemAvaliacao>
+      )}
+      {erro && (
+        <MensagemAvaliacao $erro role="alert">
+          {erro}
+        </MensagemAvaliacao>
+      )}
 
       {!carregando && linkValidado && !sessaoToken && (
         <CartaoAvaliacao as="form" onSubmit={handleIdentificar}>
@@ -145,7 +158,10 @@ export function Avaliacao() {
             onChange={(event) => setNome(event.target.value)}
             required
           />
-          <BotaoEnviarAvaliacao type="submit" disabled={enviando || !nome.trim()}>
+          <BotaoEnviarAvaliacao
+            type="submit"
+            disabled={enviando || !nome.trim()}
+          >
             {enviando ? 'Verificando...' : 'Continuar'}
           </BotaoEnviarAvaliacao>
         </CartaoAvaliacao>
@@ -179,7 +195,10 @@ export function Avaliacao() {
                   step="0.5"
                   value={notas[campo]}
                   onChange={(event) =>
-                    setNotas((atuais) => ({ ...atuais, [campo]: Number(event.target.value) }))
+                    setNotas((atuais) => ({
+                      ...atuais,
+                      [campo]: Number(event.target.value),
+                    }))
                   }
                 />
               </LinhaNotaAvaliacao>

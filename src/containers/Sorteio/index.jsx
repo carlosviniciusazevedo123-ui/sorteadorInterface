@@ -109,10 +109,14 @@ export function Sorteio() {
       });
 
       console.log('Resultado do sorteio:', resultado);
+      const jogadoresDoSorteio = jogadores.filter((jogador) =>
+        jogadoresSelecionados.includes(jogador.id)
+      );
       const sorteioConcluido = {
         drawId,
         times: respostaDraw.teams,
         participacoes: resultado,
+        jogadores: jogadoresDoSorteio,
       };
       sessionStorage.setItem(
         'sorteador.drawAtual',
