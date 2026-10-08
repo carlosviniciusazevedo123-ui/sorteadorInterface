@@ -51,13 +51,19 @@ function recuperarDraw() {
 export function Partidas() {
   const location = useLocation();
   const navigate = useNavigate();
-  const draw = location.state?.draw || recuperarDraw();
+  const draw = useMemo(
+    () => location.state?.draw || recuperarDraw(),
+    [location.state?.draw]
+  );
   const drawId = location.state?.drawId || draw?.drawId;
   const timesSorteados = location.state?.times || draw?.times || [];
   const participacoes =
     location.state?.participacoes || draw?.participacoes || [];
 
-  const jogadores = location.state?.jogadores || draw?.jogadores || [];
+  const jogadores = useMemo(
+    () => location.state?.jogadores || draw?.jogadores || [],
+    [location.state?.jogadores, draw?.jogadores]
+  );
   const [selecaoTimeA, setSelecaoTimeA] = useState({ drawId, id: '' });
   const [selecaoTimeB, setSelecaoTimeB] = useState({ drawId, id: '' });
   const timeAId = selecaoTimeA.drawId === drawId ? selecaoTimeA.id : '';
