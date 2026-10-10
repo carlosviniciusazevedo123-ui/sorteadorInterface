@@ -149,11 +149,13 @@ export function ModalEventoJogo({
             Jogador
             <select value={jogadorId} onChange={onJogadorChange}>
               <option value="">Selecione um jogador</option>
-              {jogadoresDoTime(timeDoJogadorId).map((jogador) => (
-                <option key={jogador.id} value={jogador.player_id}>
-                  {jogador.player_name || jogador.name}
-                </option>
-              ))}
+              {jogadoresDoTime(timeDoJogadorId)
+                .filter((jogador) => tipo === 'card' || !jogador.is_reserve)
+                .map((jogador) => (
+                  <option key={jogador.id} value={jogador.player_id}>
+                    {jogador.player_name || jogador.name}
+                  </option>
+                ))}
             </select>
           </CampoEventoJogo>
         )}

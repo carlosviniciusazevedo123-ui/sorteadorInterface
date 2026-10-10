@@ -72,7 +72,9 @@ export function ModalResultadoJogo({
         <p>
           {jogo.winner?.name
             ? `Vencedor: ${jogo.winner.name}`
-            : 'Jogo finalizado'}
+            : placar && placar.a === placar.b
+              ? 'Empate'
+              : 'Jogo finalizado'}
         </p>
 
         {!linkAvaliacao ? (

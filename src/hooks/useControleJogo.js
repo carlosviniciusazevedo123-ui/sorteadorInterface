@@ -29,7 +29,6 @@ export function useControleJogo(matchId, gameId) {
   const [erro, setErro] = useState('');
   const [atualizando, setAtualizando] = useState(false);
   const [segundosDecorridos, setSegundosDecorridos] = useState(0);
-  const [vencedorId, setVencedorId] = useState('');
   const [resultadoAberto, setResultadoAberto] = useState(false);
   const revisao = useRef(0);
   const consultaPeriodica = useRef(null);
@@ -155,10 +154,6 @@ export function useControleJogo(matchId, gameId) {
 
   async function handleFinalizarJogo() {
     if (acaoEmAndamento.current) return;
-    if (!vencedorId) {
-      setErro('Selecione o time vencedor.');
-      return;
-    }
 
     acaoEmAndamento.current = true;
     revisao.current += 1;
@@ -167,9 +162,7 @@ export function useControleJogo(matchId, gameId) {
     setAtualizando(true);
 
     try {
-      await api.patch(`/matches/${matchId}/games/${gameId}/finish`, {
-        winner_team_id: vencedorId,
-      });
+      await api.patch(`/matches/${matchId}/games/${gameId}/finish`, {});
       aplicarDados(await buscarDados());
       setResultadoAberto(true);
     } catch (error) {
@@ -189,8 +182,6 @@ export function useControleJogo(matchId, gameId) {
     setErro,
     atualizando,
     segundosDecorridos,
-    vencedorId,
-    setVencedorId,
     resultadoAberto,
     setResultadoAberto,
     atualizarEstadoJogo,

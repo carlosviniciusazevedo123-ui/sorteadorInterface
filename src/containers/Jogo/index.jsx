@@ -14,11 +14,9 @@ import { ModalEventoJogo } from './components/ModalEventoJogo';
 import { ModalResultadoJogo } from './components/ModalResultadoJogo';
 import {
   BotaoControleJogo,
-  CampoVencedorJogo,
   CartaoJogo,
   CronometroJogo,
   DetalhesJogo,
-  SelectVencedorJogo,
   StatusJogo,
   ElencosJogo,
   TimeElencoJogo,
@@ -76,8 +74,6 @@ export function Jogo() {
     setErro,
     atualizando,
     segundosDecorridos,
-    vencedorId,
-    setVencedorId,
     resultadoAberto,
     setResultadoAberto,
     atualizarEstadoJogo,
@@ -322,21 +318,9 @@ export function Jogo() {
               </DetalhesJogo>
 
               {jogo.status === 'in_progress' && (
-                <CampoVencedorJogo>
-                  Time vencedor
-                  <SelectVencedorJogo
-                    value={vencedorId}
-                    onChange={(event) => setVencedorId(event.target.value)}
-                  >
-                    <option value="">Selecione o vencedor</option>
-                    <option value={jogo.teamA?.id}>
-                      {jogo.teamA?.name || 'Time A'}
-                    </option>
-                    <option value={jogo.teamB?.id}>
-                      {jogo.teamB?.name || 'Time B'}
-                    </option>
-                  </SelectVencedorJogo>
-                </CampoVencedorJogo>
+                <DetalhesJogo>
+                  O resultado será definido pelo placar registrado.
+                </DetalhesJogo>
               )}
 
               <ControlesCronometroJogo>
@@ -374,7 +358,7 @@ export function Jogo() {
                     type="button"
                     $finalizar
                     onClick={handleFinalizarJogo}
-                    disabled={atualizando || !vencedorId}
+                    disabled={atualizando}
                   >
                     {atualizando ? 'Encerrando...' : 'Encerrar jogo'}
                   </BotaoControleJogo>
@@ -383,35 +367,41 @@ export function Jogo() {
             </CartaoCronometroJogo>
           </CartaoJogo>
 
-          <ModalEventoJogo
-            tipo={tipoModalEvento}
-            jogo={jogo}
-            erro={erro}
-            timeId={timeEventoId}
-            onTimeChange={(event) => {
-              setTimeEventoId(event.target.value);
-              setJogadorEventoId('');
-            }}
-            jogadorId={jogadorEventoId}
-            onJogadorChange={(event) => setJogadorEventoId(event.target.value)}
-            golContra={golContra}
-            onGolContraChange={(event) => {
-              setGolContra(event.target.checked);
-              setJogadorEventoId('');
-            }}
-            tipoCartao={tipoCartao}
-            onTipoCartaoChange={(event) => setTipoCartao(event.target.value)}
-            jogadorSaiId={jogadorSaiId}
-            onJogadorSaiChange={(event) => setJogadorSaiId(event.target.value)}
-            jogadorEntraId={jogadorEntraId}
-            onJogadorEntraChange={(event) =>
-              setJogadorEntraId(event.target.value)
-            }
-            jogadoresDoTime={jogadoresDoTime}
-            salvando={salvandoEvento}
-            onSalvar={handleSalvarEvento}
-            onFechar={() => setTipoModalEvento('')}
-          />
+          {jogo.status === 'in_progress' && (
+            <ModalEventoJogo
+              tipo={tipoModalEvento}
+              jogo={jogo}
+              erro={erro}
+              timeId={timeEventoId}
+              onTimeChange={(event) => {
+                setTimeEventoId(event.target.value);
+                setJogadorEventoId('');
+              }}
+              jogadorId={jogadorEventoId}
+              onJogadorChange={(event) =>
+                setJogadorEventoId(event.target.value)
+              }
+              golContra={golContra}
+              onGolContraChange={(event) => {
+                setGolContra(event.target.checked);
+                setJogadorEventoId('');
+              }}
+              tipoCartao={tipoCartao}
+              onTipoCartaoChange={(event) => setTipoCartao(event.target.value)}
+              jogadorSaiId={jogadorSaiId}
+              onJogadorSaiChange={(event) =>
+                setJogadorSaiId(event.target.value)
+              }
+              jogadorEntraId={jogadorEntraId}
+              onJogadorEntraChange={(event) =>
+                setJogadorEntraId(event.target.value)
+              }
+              jogadoresDoTime={jogadoresDoTime}
+              salvando={salvandoEvento}
+              onSalvar={handleSalvarEvento}
+              onFechar={() => setTipoModalEvento('')}
+            />
+          )}
 
           {resultadoAberto && (
             <ModalResultadoJogo

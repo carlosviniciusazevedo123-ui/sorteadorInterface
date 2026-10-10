@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router';
 
 import { usePartidas } from '../../hooks/usePartidas';
 import { jogosDoHistorico } from '../../utils/jogosDoHistorico';
@@ -123,6 +124,15 @@ export function Historico() {
                   <ResultadoHistorico>
                     Vencedor: <strong>{confronto.vencedor}</strong>
                   </ResultadoHistorico>
+                )}
+                {jogo?.id && (
+                  <Link to={`/jogo/${partida.id}/${jogo.id}`}>
+                    {status === 'finished'
+                      ? 'Ver resultado'
+                      : status === 'pending'
+                        ? 'Abrir jogo'
+                        : 'Retomar jogo'}
+                  </Link>
                 )}
               </CartaoHistorico>
             );

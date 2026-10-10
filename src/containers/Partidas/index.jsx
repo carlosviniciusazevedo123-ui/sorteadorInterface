@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 import { api } from '../../services/api';
 import { obterSorteioAtual } from '../../services/sorteioAtual';
@@ -116,6 +116,7 @@ export function Partidas() {
       <DescricaoJogadores>
         Escolha dois times do sorteio para criar uma partida.
       </DescricaoJogadores>
+      <Link to="/historico">Ver partidas e resultados</Link>
 
       {erro && <MensagemErroPartida role="alert">{erro}</MensagemErroPartida>}
       {!drawId && (

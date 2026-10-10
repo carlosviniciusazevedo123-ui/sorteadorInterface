@@ -11,8 +11,11 @@ import { MemoryRouter, Route, Routes, useNavigate } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Avaliacao } from '../src/containers/Avaliacao';
+import { Historico } from '../src/containers/Historico';
 import { EditarJogador } from '../src/containers/Jogadores/Cadastro/editarJogador';
 import { Jogo } from '../src/containers/Jogo';
+import { ModalEventoJogo } from '../src/containers/Jogo/components/ModalEventoJogo';
+import { Partidas } from '../src/containers/Partidas';
 import { useControleJogo } from '../src/hooks/useControleJogo';
 import { api } from '../src/services/api';
 
@@ -37,6 +40,144 @@ const jogo = {
   elapsed_seconds: 0,
   status: 'pending',
 };
+
+describe('Correções de jogo e histórico', () => {
+  it('substitui o modal de evento pelo resultado ao encerrar remotamente', async () => {
+    vi.useFakeTimers();
+    let remoto = { ...jogo, status: 'in_progress' };
+    api.get.mockImplementation((url) =>
+      Promise.resolve({
+        data: url.endsWith('/events')
+          ? []
+          : url === '/matches/m'
+            ? partida
+            : remoto,
+      })
+    );
+    render(
+      <MemoryRouter initialEntries={['/jogo/m/g']}>
+        <Routes>
+          <Route path="/jogo/:matchId/:gameId" element={<Jogo />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    await act(async () => {});
+    fireEvent.click(screen.getByRole('button', { name: 'Gol' }));
+    expect(screen.getByRole('dialog').textContent).toContain('Registrar gol');
+    remoto = { ...jogo, status: 'finished', winner_team_id: null };
+    await act(async () => vi.advanceTimersByTimeAsync(3000));
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.textContent).toContain('Resultado do jogo');
+    within(dialog).getByRole('button', { name: 'Fechar resultado' }).focus();
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Fechar resultado' })
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('encerra um empate sem exigir a seleção de vencedor', async () => {
+    let remoto = { ...jogo, status: 'in_progress' };
+    api.get.mockImplementation((url) =>
+      Promise.resolve({
+        data: url.endsWith('/events')
+          ? []
+          : url === '/matches/m'
+            ? partida
+            : remoto,
+      })
+    );
+    api.patch.mockImplementation(async () => {
+      remoto = { ...jogo, status: 'finished', winner_team_id: null };
+      return {};
+    });
+    render(
+      <MemoryRouter initialEntries={['/jogo/m/g']}>
+        <Routes>
+          <Route path="/jogo/:matchId/:gameId" element={<Jogo />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Encerrar jogo' })
+    );
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText('Empate')).not.toBeNull();
+    expect(api.patch).toHaveBeenCalledWith('/matches/m/games/g/finish', {});
+  });
+
+  it.each([
+    ['pending', 'Abrir jogo'],
+    ['paused', 'Retomar jogo'],
+    ['in_progress', 'Retomar jogo'],
+    ['finished', 'Ver resultado'],
+  ])('reabre um jogo %s pelo histórico', async (status, label) => {
+    api.get.mockResolvedValue({
+      data: [
+        { id: 'm', teams: partida.teams, games: [{ ...jogo, status }], status },
+      ],
+    });
+    render(
+      <MemoryRouter initialEntries={['/historico']}>
+        <Routes>
+          <Route path="/historico" element={<Historico />} />
+          <Route path="/jogo/:matchId/:gameId" element={<p>Jogo reaberto</p>} />
+        </Routes>
+      </MemoryRouter>
+    );
+    const link = await screen.findByRole('link', { name: label });
+    expect(link.getAttribute('href')).toBe('/jogo/m/g');
+    fireEvent.click(link);
+    expect(screen.getByText('Jogo reaberto')).not.toBeNull();
+  });
+
+  it('oferece acesso às partidas existentes mesmo sem sorteio nesta sessão', () => {
+    render(
+      <MemoryRouter>
+        <Partidas />
+      </MemoryRouter>
+    );
+    expect(
+      screen
+        .getByRole('link', { name: 'Ver partidas e resultados' })
+        .getAttribute('href')
+    ).toBe('/historico');
+  });
+
+  it.each(['goal', 'assist', 'card'])(
+    'filtra reservas no seletor de %s sem bloquear cartões',
+    (tipo) => {
+      render(
+        <ModalEventoJogo
+          tipo={tipo}
+          jogo={{ ...jogo, teamA: { id: 'a' }, teamB: { id: 'b' } }}
+          timeId="a"
+          jogadoresDoTime={() => [
+            {
+              id: '1',
+              player_id: 'p',
+              player_name: 'Titular',
+              is_reserve: false,
+            },
+            {
+              id: '2',
+              player_id: 'q',
+              player_name: 'Reserva',
+              is_reserve: true,
+            },
+          ]}
+          onFechar={vi.fn()}
+        />
+      );
+      expect(screen.getByRole('option', { name: 'Titular' })).not.toBeNull();
+      expect(Boolean(screen.queryByRole('option', { name: 'Reserva' }))).toBe(
+        tipo === 'card'
+      );
+    }
+  );
+});
 
 describe('Sincronização de jogo e elencos', () => {
   it.each(['pending', 'paused'])(
