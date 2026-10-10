@@ -127,3 +127,24 @@ export const MensagemAvaliacao = styled.p`
   font-size: 14px;
   line-height: 1.5;
 `;
+
+export const TempoRestanteAvaliacao = styled.p`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: 500;
+
+  strong {
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    color: ${({ $urgente }) => ($urgente ? '#ef4444' : 'inherit')};
+
+    transition: color 0.3s ease;
+  }
+`;

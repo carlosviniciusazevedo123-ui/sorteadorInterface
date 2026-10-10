@@ -21,6 +21,7 @@ export function ModalResultadoJogo({
   expiraAvaliacao,
   linkCopiado,
   gerandoLink,
+  avaliacaoExpirada,
   onGerarLink,
   onCopiarLink,
   onCriarOutraPartida,
@@ -81,9 +82,13 @@ export function ModalResultadoJogo({
           <BotaoAcaoJogo
             type="button"
             onClick={onGerarLink}
-            disabled={gerandoLink}
+            disabled={gerandoLink || avaliacaoExpirada}
           >
-            {gerandoLink ? 'Gerando link...' : 'Gerar link de avaliação'}
+            {gerandoLink
+              ? 'Gerando link...'
+              : avaliacaoExpirada
+                ? 'Prazo de avaliação encerrado'
+                : 'Gerar link de avaliação'}
           </BotaoAcaoJogo>
         ) : (
           <>

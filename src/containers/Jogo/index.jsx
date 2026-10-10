@@ -83,6 +83,7 @@ export function Jogo() {
   const [linkAvaliacao, setLinkAvaliacao] = useState('');
   const [linkCopiado, setLinkCopiado] = useState(false);
   const [expiraAvaliacao, setExpiraAvaliacao] = useState('');
+  const [avaliacaoExpirada, setAvaliacaoExpirada] = useState(false);
   const {
     placar,
     eventos,
@@ -117,6 +118,7 @@ export function Jogo() {
   });
 
   async function handleGerarLinkAvaliacao() {
+    if (gerandoLinkAvaliacao || avaliacaoExpirada) return;
     setErro('');
     setGerandoLinkAvaliacao(true);
 
@@ -137,6 +139,16 @@ export function Jogo() {
         'Erro ao gerar link da avaliação:',
         error.response?.data ?? error
       );
+
+      if (error.response?.status === 410) {
+        setAvaliacaoExpirada(true);
+
+        setErro(
+          'O prazo de avaliação desta partida terminou. Não é mais possível gerar o link.'
+        );
+        return;
+      }
+
       setErro(
         mensagemDoErro(error, 'Não foi possível gerar o link de avaliação.')
       );
@@ -417,6 +429,7 @@ export function Jogo() {
               gerandoLink={gerandoLinkAvaliacao}
               onGerarLink={handleGerarLinkAvaliacao}
               onCopiarLink={handleCopiarLinkAvaliacao}
+              avaliacaoExpirada={avaliacaoExpirada}
               onCriarOutraPartida={() => {
                 sessionStorage.removeItem('sorteador.partida');
                 navigate('/partidas', {
