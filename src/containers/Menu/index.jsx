@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { useJogadores } from '../../hooks/useJogadores';
 import { usePartidas } from '../../hooks/usePartidas';
 import { limparSessao, obterUsuario } from '../../services/session';
+import { obterSorteioAtual } from '../../services/sorteioAtual';
 import {
   Cabecalho,
   PerfilUsuario,
@@ -51,6 +52,7 @@ export function Menu() {
   } = usePartidas();
 
   const [usuario] = useState(obterUsuario);
+  const [ultimoSorteio] = useState(obterSorteioAtual);
 
   const primeiroNome = usuario?.name?.trim().split(/\s+/)[0] || 'por aí';
   const primeiroNomeFormatado =
@@ -127,8 +129,22 @@ export function Menu() {
       <SecaoUltimoSorteio aria-label="Último sorteio">
         <TituloSecao>Último sorteio</TituloSecao>
         <CartaoSorteioVazio>
-          <span>Ainda não há sorteios registrados.</span>
-          <AcaoVazia to="/sorteio">Fazer primeiro sorteio</AcaoVazia>
+          {ultimoSorteio ? (
+            <>
+              <span>
+                {ultimoSorteio.times.length} times ·{' '}
+                {ultimoSorteio.participacoes.length} jogadores sorteados
+              </span>
+              <AcaoVazia to="/partidas" state={{ draw: ultimoSorteio }}>
+                Ver times e criar partida
+              </AcaoVazia>
+            </>
+          ) : (
+            <>
+              <span>Nenhum sorteio disponível nesta sessão.</span>
+              <AcaoVazia to="/sorteio">Fazer sorteio</AcaoVazia>
+            </>
+          )}
         </CartaoSorteioVazio>
       </SecaoUltimoSorteio>
       <SecaoAcoes>

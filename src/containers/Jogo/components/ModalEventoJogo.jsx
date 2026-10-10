@@ -1,3 +1,4 @@
+import { useFocoModal } from '../../../hooks/useFocoModal';
 import {
   BotaoAcaoJogo,
   BotaoEventoJogo,
@@ -38,6 +39,7 @@ export function ModalEventoJogo({
   onSalvar,
   onFechar,
 }) {
+  const refModal = useFocoModal(Boolean(tipo), onFechar, !salvando);
   if (!tipo) return null;
 
   const timeDoJogadorId =
@@ -55,6 +57,8 @@ export function ModalEventoJogo({
       }}
     >
       <ModalEvento
+        ref={refModal}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="titulo-modal-evento"

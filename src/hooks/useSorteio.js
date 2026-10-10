@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { api } from '../services/api';
+import { salvarSorteioAtual } from '../services/sorteioAtual';
 import { mensagemDoErro } from '../utils/mensagemDoErro';
-
-const CHAVE_DRAW_ATUAL = 'sorteador.drawAtual';
+import { validarSorteio } from '../utils/validarSorteio';
 
 export function useSorteio(jogadores) {
   const [jogadoresSelecionados, setJogadoresSelecionados] = useState([]);
@@ -16,6 +16,7 @@ export function useSorteio(jogadores) {
   const [sorteando, setSorteando] = useState(false);
   const [resultadoSorteio, setResultadoSorteio] = useState(null);
   const [erro, setErro] = useState('');
+  const sorteioEmAndamento = useRef(false);
 
   const jogadoresFiltrados = useMemo(() => {
     const termo = busca.trim().toLocaleLowerCase('pt-BR');
@@ -34,11 +35,24 @@ export function useSorteio(jogadores) {
   }
 
   async function handleSortear() {
-    if (jogadoresSelecionados.length === 0) {
-      setErro('Selecione pelo menos um jogador.');
+    if (sorteioEmAndamento.current) return;
+    const jogadoresDoSorteio = jogadores.filter((jogador) =>
+      jogadoresSelecionados.includes(jogador.id)
+    );
+    const erroValidacao = validarSorteio({
+      quantidadeTimes,
+      jogadoresPorTime,
+      temReserva,
+      reservasPorTime,
+      considerarGoleiros,
+      jogadoresSelecionados: jogadoresDoSorteio,
+    });
+    if (erroValidacao) {
+      setErro(erroValidacao);
       return;
     }
 
+    sorteioEmAndamento.current = true;
     setErro('');
     setResultadoSorteio(null);
     setSorteando(true);
@@ -57,9 +71,6 @@ export function useSorteio(jogadores) {
         playerIds: jogadoresSelecionados,
       });
 
-      const jogadoresDoSorteio = jogadores.filter((jogador) =>
-        jogadoresSelecionados.includes(jogador.id)
-      );
       const sorteioConcluido = {
         drawId,
         times: respostaDraw.teams,
@@ -67,15 +78,13 @@ export function useSorteio(jogadores) {
         jogadores: jogadoresDoSorteio,
       };
 
-      sessionStorage.setItem(
-        CHAVE_DRAW_ATUAL,
-        JSON.stringify(sorteioConcluido)
-      );
+      salvarSorteioAtual(sorteioConcluido);
       setResultadoSorteio(sorteioConcluido);
     } catch (error) {
       console.error('Erro ao sortear:', error.response?.data ?? error);
       setErro(mensagemDoErro(error, 'Não foi possível realizar o sorteio.'));
     } finally {
+      sorteioEmAndamento.current = false;
       setSorteando(false);
     }
   }

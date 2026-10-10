@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '../services/api';
 import { mensagemDoErro } from '../utils/mensagemDoErro';
@@ -31,18 +31,29 @@ export function useControleJogo(matchId, gameId) {
   const [segundosDecorridos, setSegundosDecorridos] = useState(0);
   const [vencedorId, setVencedorId] = useState('');
   const [resultadoAberto, setResultadoAberto] = useState(false);
+  const revisao = useRef(0);
+  const consultaPeriodica = useRef(null);
+  const acaoEmAndamento = useRef(false);
 
-  const buscarDados = useCallback(async () => {
-    const [{ data: dadosJogo }, { data: dadosPartida }] = await Promise.all([
-      api.get(`/matches/${matchId}/games/${gameId}`),
-      api.get(`/matches/${matchId}`),
-    ]);
+  const atualizarPartidaLocal = useCallback((dados) => {
+    revisao.current += 1;
+    setPartida(dados);
+  }, []);
 
-    return {
-      partida: obterPartida(dadosPartida),
-      jogo: obterJogo(dadosJogo),
-    };
-  }, [matchId, gameId]);
+  const buscarDados = useCallback(
+    async (signal) => {
+      const [{ data: dadosJogo }, { data: dadosPartida }] = await Promise.all([
+        api.get(`/matches/${matchId}/games/${gameId}`, { signal }),
+        api.get(`/matches/${matchId}`, { signal }),
+      ]);
+
+      return {
+        partida: obterPartida(dadosPartida),
+        jogo: obterJogo(dadosJogo),
+      };
+    },
+    [matchId, gameId]
+  );
 
   const aplicarDados = useCallback(
     ({ partida: dadosPartida, jogo: dadosJogo }) => {
@@ -78,31 +89,40 @@ export function useControleJogo(matchId, gameId) {
   }, [buscarDados, aplicarDados]);
 
   useEffect(() => {
-    if (jogo?.status !== 'in_progress') return;
+    if (
+      !['pending', 'paused', 'in_progress'].includes(jogo?.status) ||
+      atualizando
+    )
+      return;
 
-    let ativo = true;
-    const intervalo = setInterval(async () => {
+    const controller = new AbortController();
+    consultaPeriodica.current = controller;
+    let intervalo;
+    async function consultar() {
+      const revisaoConsulta = revisao.current;
       try {
-        const { data } = await api.get(`/matches/${matchId}/games/${gameId}`);
-        const dadosJogo = obterJogo(data);
-        if (!ativo) return;
+        const dados = await buscarDados(controller.signal);
+        if (controller.signal.aborted || revisaoConsulta !== revisao.current)
+          return;
 
-        setJogo(enriquecerJogo(dadosJogo, partida));
-        setSegundosDecorridos(Number(dadosJogo.elapsed_seconds) || 0);
-        setResultadoAberto(dadosJogo.status === 'finished');
+        aplicarDados(dados);
       } catch (error) {
+        if (controller.signal.aborted) return;
         console.error(
           'Erro ao atualizar o estado do jogo:',
           error.response?.data ?? error
         );
+      } finally {
+        if (!controller.signal.aborted) intervalo = setTimeout(consultar, 3000);
       }
-    }, 3000);
+    }
+    intervalo = setTimeout(consultar, 3000);
 
     return () => {
-      ativo = false;
-      clearInterval(intervalo);
+      controller.abort();
+      clearTimeout(intervalo);
     };
-  }, [jogo?.status, matchId, gameId, partida]);
+  }, [jogo?.status, buscarDados, aplicarDados, atualizando]);
 
   useEffect(() => {
     if (jogo?.status !== 'in_progress') return;
@@ -115,6 +135,10 @@ export function useControleJogo(matchId, gameId) {
   }, [jogo?.status]);
 
   async function atualizarEstadoJogo(acao) {
+    if (acaoEmAndamento.current) return;
+    acaoEmAndamento.current = true;
+    revisao.current += 1;
+    consultaPeriodica.current?.abort();
     setErro('');
     setAtualizando(true);
 
@@ -124,16 +148,21 @@ export function useControleJogo(matchId, gameId) {
     } catch (error) {
       setErro(mensagemDoErro(error, 'Não foi possível atualizar o jogo.'));
     } finally {
+      acaoEmAndamento.current = false;
       setAtualizando(false);
     }
   }
 
   async function handleFinalizarJogo() {
+    if (acaoEmAndamento.current) return;
     if (!vencedorId) {
       setErro('Selecione o time vencedor.');
       return;
     }
 
+    acaoEmAndamento.current = true;
+    revisao.current += 1;
+    consultaPeriodica.current?.abort();
     setErro('');
     setAtualizando(true);
 
@@ -146,14 +175,15 @@ export function useControleJogo(matchId, gameId) {
     } catch (error) {
       setErro(mensagemDoErro(error, 'Não foi possível finalizar o jogo.'));
     } finally {
+      acaoEmAndamento.current = false;
       setAtualizando(false);
     }
   }
 
   return {
     partida,
-    setPartida,
-    jogo,
+    setPartida: atualizarPartidaLocal,
+    jogo: jogo ? enriquecerJogo(jogo, partida) : null,
     carregando,
     erro,
     setErro,

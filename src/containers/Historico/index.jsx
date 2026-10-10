@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { usePartidas } from '../../hooks/usePartidas';
+import { jogosDoHistorico } from '../../utils/jogosDoHistorico';
 import {
   PaginaJogadores as PaginaHistorico,
   EyebrowJogadores,
@@ -66,12 +67,7 @@ function obterConfronto(partida, jogo) {
 export function Historico() {
   const { partidas, carregando, erro } = usePartidas({ incluirDetalhes: true });
   const partidasOrdenadas = useMemo(
-    () =>
-      [...partidas].sort((a, b) => {
-        const dataA = new Date(a.finished_at || a.createdAt || 0);
-        const dataB = new Date(b.finished_at || b.createdAt || 0);
-        return dataB - dataA;
-      }),
+    () => jogosDoHistorico(partidas),
     [partidas]
   );
 
@@ -98,21 +94,11 @@ export function Historico() {
 
       {!carregando && partidasOrdenadas.length > 0 && (
         <ListaHistorico>
-          {partidasOrdenadas.map((partida) => {
-            const jogos = partida.games || [];
-            const jogo = jogos[0];
+          {partidasOrdenadas.map(({ partida, jogo, data, chave }) => {
             const confronto = obterConfronto(partida, jogo);
             const status = jogo?.status || partida.status;
-            const data =
-              jogo?.finished_at ||
-              jogo?.finishedAt ||
-              partida.finished_at ||
-              partida.finishedAt ||
-              jogo?.createdAt ||
-              partida.createdAt;
-
             return (
-              <CartaoHistorico key={partida.id}>
+              <CartaoHistorico key={chave}>
                 <CabecalhoHistorico>
                   <DataHistorico>{formatarData(data)}</DataHistorico>
                   <StatusHistorico $status={status}>

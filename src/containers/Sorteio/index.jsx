@@ -93,11 +93,11 @@ export function Sorteio() {
       {carregando && <p role="status">Carregando jogadores...</p>}
       {erroExibido && <p role="alert">{erroExibido}</p>}
 
-      {!carregando && !erroExibido && jogadores.length === 0 && (
+      {!carregando && !erroCarregamento && jogadores.length === 0 && (
         <p>Cadastre jogadores antes de preparar um sorteio.</p>
       )}
 
-      {!carregando && !erroExibido && jogadores.length > 0 && (
+      {!carregando && !erroCarregamento && jogadores.length > 0 && (
         <SecaoSelecao>
           {!resultadoSorteio && (
             <>
@@ -147,6 +147,7 @@ export function Sorteio() {
                     <BotaoAjusteQuantidade
                       type="button"
                       aria-label="Aumentar quantidade de times"
+                      disabled={quantidadeTimes >= 50}
                       onClick={() =>
                         setQuantidadeTimes((quantidade) => quantidade + 1)
                       }
@@ -158,10 +159,11 @@ export function Sorteio() {
 
                 <GradeConfiguracoes>
                   <CampoConfiguracao>
-                    Jogadores por time
+                    Jogadores de linha por time
                     <InputConfiguracao
                       type="number"
                       min="1"
+                      max="20"
                       value={jogadoresPorTime}
                       onChange={(event) =>
                         setJogadoresPorTime(Number(event.target.value))
@@ -175,6 +177,7 @@ export function Sorteio() {
                       <InputConfiguracao
                         type="number"
                         min="1"
+                        max="10"
                         value={reservasPorTime}
                         onChange={(event) =>
                           setReservasPorTime(Number(event.target.value))

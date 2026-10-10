@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { api } from '../../services/api';
+import { obterSorteioAtual } from '../../services/sorteioAtual';
 import { formatarNome } from '../../utils/formatarNome';
 import { mensagemDoErro } from '../../utils/mensagemDoErro';
 import {
@@ -23,21 +24,11 @@ import {
   EntradaDuracaoJogo,
 } from './styles';
 
-const CHAVE_DRAW_ATUAL = 'sorteador.drawAtual';
-
-function recuperarDraw() {
-  try {
-    return JSON.parse(sessionStorage.getItem(CHAVE_DRAW_ATUAL) || 'null');
-  } catch {
-    return null;
-  }
-}
-
 export function Partidas() {
   const location = useLocation();
   const navigate = useNavigate();
   const draw = useMemo(
-    () => location.state?.draw || recuperarDraw(),
+    () => location.state?.draw || obterSorteioAtual(),
     [location.state?.draw]
   );
   const drawId = location.state?.drawId || draw?.drawId;

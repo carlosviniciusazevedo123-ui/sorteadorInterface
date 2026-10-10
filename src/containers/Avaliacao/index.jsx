@@ -28,6 +28,10 @@ function notasIniciais() {
 
 export function Avaliacao() {
   const { token } = useParams();
+  return <FormularioAvaliacao key={token} token={token} />;
+}
+
+function FormularioAvaliacao({ token }) {
   const [carregando, setCarregando] = useState(true);
   const [linkValidado, setLinkValidado] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -41,21 +45,27 @@ export function Avaliacao() {
   const [concluida, setConcluida] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function validarLink() {
       try {
-        const { data } = await api.get(`/evaluations/${token}`);
+        const { data } = await api.get(`/evaluations/${token}`, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
         setExpiraEm(data.expires_at || '');
         setLinkValidado(true);
       } catch (error) {
+        if (controller.signal.aborted) return;
         setErro(
           mensagemDoErro(error, 'Este link de avaliação é inválido ou expirou.')
         );
       } finally {
-        setCarregando(false);
+        if (!controller.signal.aborted) setCarregando(false);
       }
     }
 
     validarLink();
+    return () => controller.abort();
   }, [token]);
 
   const jogadorAtual = jogadores[indiceJogador];

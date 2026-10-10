@@ -66,7 +66,10 @@ export function Rotas() {
         <Route path="historico" element={<Historico />} />
         <Route path="jogadores/cadastro" element={<CadastroJogador />} />
         <Route path="jogadores/editar/:id" element={<EditarJogador />} />
-        <Route path="jogo/:matchId/:gameId" element={<Jogo />} />
+        <Route
+          path="jogo/:matchId/:gameId"
+          element={<Jogo key={location.pathname} />}
+        />
       </Route>
     </Routes>
   );

@@ -90,6 +90,9 @@ export function Jogo() {
   const {
     placar,
     eventos,
+    carregandoEventos,
+    erroEventos,
+    recarregarEventos,
     tipoModalEvento,
     setTipoModalEvento,
     timeEventoId,
@@ -166,6 +169,17 @@ export function Jogo() {
 
       {carregando && <p role="status">Carregando jogo...</p>}
       {erro && <p role="alert">{erro}</p>}
+      {carregandoEventos && !erroEventos && (
+        <p role="status">Carregando placar e eventos...</p>
+      )}
+      {erroEventos && (
+        <div role="alert">
+          <p>{erroEventos}</p>
+          <BotaoEventoJogo type="button" onClick={recarregarEventos}>
+            Tentar carregar eventos novamente
+          </BotaoEventoJogo>
+        </div>
+      )}
 
       {jogo && (
         <>
@@ -213,13 +227,13 @@ export function Jogo() {
                   -
                 </BotaoPlacarJogo>
 
-                <ValorPlacarJogo>{placar.a}</ValorPlacarJogo>
+                <ValorPlacarJogo>{placar?.a ?? '—'}</ValorPlacarJogo>
 
                 <BotaoPlacarJogo
                   type="button"
                   aria-label={`Registrar gol para ${jogo.teamA?.name || 'Time A'}`}
                   onClick={() => abrirModalEvento('goal', jogo.teamA?.id)}
-                  disabled={jogo.status !== 'in_progress'}
+                  disabled={carregandoEventos || jogo.status !== 'in_progress'}
                 >
                   +
                 </BotaoPlacarJogo>
@@ -230,11 +244,11 @@ export function Jogo() {
                   type="button"
                   aria-label={`Registrar gol para ${jogo.teamB?.name || 'Time B'}`}
                   onClick={() => abrirModalEvento('goal', jogo.teamB?.id)}
-                  disabled={jogo.status !== 'in_progress'}
+                  disabled={carregandoEventos || jogo.status !== 'in_progress'}
                 >
                   +
                 </BotaoPlacarJogo>
-                <ValorPlacarJogo>{placar.b}</ValorPlacarJogo>
+                <ValorPlacarJogo>{placar?.b ?? '—'}</ValorPlacarJogo>
                 <BotaoPlacarJogo
                   type="button"
                   aria-label="Remover gol do Time B"
@@ -247,7 +261,7 @@ export function Jogo() {
               </GrupoPlacarJogo>
             </PlacarJogo>
 
-            {jogo.status === 'in_progress' && (
+            {jogo.status === 'in_progress' && !carregandoEventos && (
               <AcoesRapidasJogo className="quick-events">
                 <h3>Lançar evento</h3>
                 <GradeAcoesJogo>
@@ -403,6 +417,9 @@ export function Jogo() {
             <ModalResultadoJogo
               jogo={jogo}
               placar={placar}
+              erroEventos={erroEventos}
+              erro={erro}
+              onRecarregarEventos={recarregarEventos}
               tempoDecorrido={formatarTempo(segundosDecorridos)}
               linkAvaliacao={linkAvaliacao}
               expiraAvaliacao={expiraAvaliacao}

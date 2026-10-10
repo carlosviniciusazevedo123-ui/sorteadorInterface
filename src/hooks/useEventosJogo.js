@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { api } from '../services/api';
+import { calcularPlacar } from '../utils/calcularPlacar';
 import { mensagemDoErro } from '../utils/mensagemDoErro';
 
 export function useEventosJogo({
@@ -19,41 +20,80 @@ export function useEventosJogo({
   const [golContra, setGolContra] = useState(false);
   const [tipoCartao, setTipoCartao] = useState('yellow_card');
   const [salvandoEvento, setSalvandoEvento] = useState(false);
-  const [eventos, setEventos] = useState(() => {
-    try {
-      return JSON.parse(
-        sessionStorage.getItem(`sorteador.eventos.${matchId}.${gameId}`) || '[]'
-      );
-    } catch {
-      return [];
+  const chaveJogo = `${matchId}.${gameId}`;
+  const [historico, setHistorico] = useState(null);
+  const [tentativa, setTentativa] = useState(0);
+  const revisaoEventos = useRef(0);
+  const eventosCarregados =
+    historico?.chave === chaveJogo ? historico.eventos : null;
+  const erroEventos = historico?.chave === chaveJogo ? historico.erro : '';
+  const carregandoEventos = eventosCarregados === null;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let intervalo;
+
+    async function carregarEventos() {
+      const revisao = revisaoEventos.current;
+      try {
+        const { data } = await api.get(
+          `/matches/${matchId}/games/${gameId}/events`,
+          { signal: controller.signal }
+        );
+        if (controller.signal.aborted || revisao !== revisaoEventos.current)
+          return;
+        if (!Array.isArray(data))
+          throw new Error('Resposta de eventos inválida.');
+        setHistorico({ chave: chaveJogo, eventos: data, erro: '' });
+      } catch (error) {
+        if (controller.signal.aborted || revisao !== revisaoEventos.current)
+          return;
+        setHistorico((atual) => ({
+          chave: chaveJogo,
+          eventos: atual?.chave === chaveJogo ? atual.eventos : null,
+          erro: mensagemDoErro(
+            error,
+            'Não foi possível carregar os eventos do jogo.'
+          ),
+        }));
+      } finally {
+        if (!controller.signal.aborted && jogo?.status === 'in_progress') {
+          intervalo = setTimeout(carregarEventos, 3000);
+        }
+      }
     }
-  });
+
+    carregarEventos();
+    return () => {
+      controller.abort();
+      clearTimeout(intervalo);
+    };
+  }, [matchId, gameId, chaveJogo, jogo?.status, tentativa]);
+
+  const eventos = useMemo(
+    () =>
+      (eventosCarregados || []).map((evento) => {
+        const jogador = partida?.teams
+          ?.flatMap((time) => time.players || [])
+          .find((item) => item.player_id === evento.player_id);
+        return {
+          ...evento,
+          player_name:
+            evento.player_name ||
+            jogador?.player_name ||
+            jogador?.name ||
+            'Jogador',
+        };
+      }),
+    [eventosCarregados, partida?.teams]
+  );
 
   const placar = useMemo(
     () =>
-      eventos.reduce(
-        (total, evento) => {
-          if (
-            evento.event_type !== 'goal' &&
-            evento.event_type !== 'own_goal'
-          ) {
-            return total;
-          }
-
-          const timeQueMarca =
-            evento.event_type === 'own_goal'
-              ? evento.team_id === jogo?.teamA?.id
-                ? jogo?.teamB?.id
-                : jogo?.teamA?.id
-              : evento.team_id;
-
-          if (timeQueMarca === jogo?.teamA?.id) total.a += 1;
-          if (timeQueMarca === jogo?.teamB?.id) total.b += 1;
-          return total;
-        },
-        { a: 0, b: 0 }
-      ),
-    [eventos, jogo?.teamA?.id, jogo?.teamB?.id]
+      carregandoEventos
+        ? null
+        : calcularPlacar(eventos, jogo?.teamA?.id, jogo?.teamB?.id),
+    [carregandoEventos, eventos, jogo?.teamA?.id, jogo?.teamB?.id]
   );
 
   function abrirModalEvento(tipo, teamId = jogo?.teamA?.id || '') {
@@ -104,6 +144,7 @@ export function useEventosJogo({
   }
 
   async function handleSalvarEvento() {
+    if (carregandoEventos || salvandoEvento) return;
     const eventoAtual =
       tipoModalEvento === 'card' ? tipoCartao : tipoModalEvento;
     const timeRealDoJogador = golContra
@@ -143,12 +184,21 @@ export function useEventosJogo({
       const novosEventos = [];
       const guardarEventosRecebidos = () => {
         if (!novosEventos.length) return;
-        const eventosAtualizados = [...eventos, ...novosEventos];
-        setEventos(eventosAtualizados);
-        sessionStorage.setItem(
-          `sorteador.eventos.${matchId}.${gameId}`,
-          JSON.stringify(eventosAtualizados)
-        );
+        revisaoEventos.current += 1;
+        setHistorico((atual) => {
+          if (atual && atual.chave !== chaveJogo) return atual;
+          const anteriores = atual?.eventos || [];
+          return {
+            chave: chaveJogo,
+            eventos: [
+              ...anteriores,
+              ...novosEventos.filter(
+                (novo) => !anteriores.some((evento) => evento.id === novo.id)
+              ),
+            ],
+            erro: '',
+          };
+        });
       };
 
       if (tipoModalEvento === 'substitution') {
@@ -201,6 +251,9 @@ export function useEventosJogo({
   return {
     placar,
     eventos,
+    carregandoEventos,
+    erroEventos,
+    recarregarEventos: () => setTentativa((atual) => atual + 1),
     tipoModalEvento,
     setTipoModalEvento,
     timeEventoId,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
 import { api } from '../../../services/api';
@@ -9,6 +9,11 @@ import { LinkVoltarJogadores } from './styles';
 
 export function EditarJogador() {
   const { id } = useParams();
+  return <FormularioEdicao key={id} id={id} />;
+}
+
+function FormularioEdicao({ id }) {
+  const ativo = useRef(true);
   const navigate = useNavigate();
   const [salvando, setSalvando] = useState(false);
   const [jogador, setJogador] = useState(null);
@@ -19,25 +24,35 @@ export function EditarJogador() {
   const [ehGoleiro, setEhGoleiro] = useState(false);
 
   useEffect(() => {
+    ativo.current = true;
+    const controller = new AbortController();
     async function carregarJogador() {
       try {
-        const { data } = await api.get(`/players/${id}`);
+        const { data } = await api.get(`/players/${id}`, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
         setJogador(data);
         setNome(data.name);
         setPosicao(data.position ?? '');
         setEhGoleiro(data.is_goalkeeper);
       } catch (error) {
+        if (controller.signal.aborted) return;
         setErro(
           error.response?.status === 404
             ? 'Jogador não encontrado.'
             : 'Não foi possível carregar os dados do jogador.'
         );
       } finally {
-        setCarregando(false);
+        if (!controller.signal.aborted) setCarregando(false);
       }
     }
 
     carregarJogador();
+    return () => {
+      ativo.current = false;
+      controller.abort();
+    };
   }, [id]);
 
   async function handleSubmit(event) {
@@ -58,7 +73,7 @@ export function EditarJogador() {
         is_goalkeeper: ehGoleiro,
       });
 
-      navigate('/jogadores', { replace: true });
+      if (ativo.current) navigate('/jogadores', { replace: true });
     } catch (error) {
       setErro(
         mensagemErroJogador(error, 'Não foi possível salvar as alterações.')
