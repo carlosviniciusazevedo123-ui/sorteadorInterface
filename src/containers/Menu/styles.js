@@ -162,7 +162,7 @@ export const CartaoPartida = styled(CartaoResumo)`
 `;
 
 export const CartaoSorteioVazio = styled.div`
-  padding: 18px;
+  padding: clamp(18px, 4vw, 32px);
   border: 1px solid #e8e4dc;
   border-radius: 14px;
   background: #fff;
@@ -274,7 +274,7 @@ export const AcoesGrid = styled.div`
   gap: 12px;
 `;
 
-export const SecaoUltimoSorteio = styled.section`
+export const SecaoUltimoJogo = styled.section`
   margin-top: 28px;
 `;
 
@@ -309,5 +309,143 @@ export const AcaoVazia = styled(Link)`
   &:focus-visible {
     outline: 2px solid #355345;
     outline-offset: 3px;
+  }
+`;
+
+export const NotaResumo = styled.span`
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 11px;
+  line-height: 1.4;
+`;
+export const InformacoesJogo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+`;
+export const StatusJogo = styled.span`
+  border-radius: 20px;
+  padding: 4px 10px;
+  background: #e8efe5;
+  color: #355345;
+  font-size: 11px;
+  font-weight: 700;
+`;
+export const ConfrontoJogo = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: center;
+  color: #302e28;
+  font-family: Manrope, sans-serif;
+  > strong {
+    overflow-wrap: anywhere;
+    font-size: clamp(16px, 2.5vw, 22px);
+  }
+  .time-a {
+    color: #355345;
+  }
+  .time-b {
+    color: #a07842;
+  }
+  @media (max-width: 520px) {
+    gap: 8px;
+    font-size: 12px;
+  }
+`;
+export const PlacarJogo = styled.span`
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  color: #355345;
+  font-size: clamp(20px, 4vw, 36px);
+  font-weight: 700;
+  white-space: nowrap;
+`;
+
+export const ElencosUltimoJogo = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+
+  @media (max-width: 520px) {
+    gap: 8px;
+  }
+`;
+
+export const TimeUltimoJogo = styled.section`
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e8e4dc;
+  border-top: 3px solid ${({ $segundo }) => ($segundo ? '#a07842' : '#355345')};
+  border-radius: 12px;
+  background: #faf9f6;
+
+  h3 {
+    margin: 0 0 16px;
+    color: ${({ $segundo }) => ($segundo ? '#a07842' : '#355345')};
+    font-family: Manrope, sans-serif;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  @media (max-width: 520px) {
+    padding: 12px 10px;
+    h3 {
+      font-size: 13px;
+    }
+  }
+`;
+
+export const CabecalhoUltimoJogo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  time {
+    font-size: 12px;
+  }
+`;
+
+export const ListaJogadoresTime = styled.ul`
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e8e4dc;
+    color: #302e28;
+  }
+
+  li:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-weight: 600;
+  }
+  span {
+    color: #8d8980;
+    font-size: 11px;
   }
 `;

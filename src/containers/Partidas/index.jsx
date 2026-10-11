@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 
+import { useUltimoSorteio } from '../../hooks/useUltimoSorteio';
 import { api } from '../../services/api';
-import { obterSorteioAtual } from '../../services/sorteioAtual';
 import { formatarNome } from '../../utils/formatarNome';
 import { mensagemDoErro } from '../../utils/mensagemDoErro';
 import {
@@ -27,10 +27,14 @@ import {
 export function Partidas() {
   const location = useLocation();
   const navigate = useNavigate();
-  const draw = useMemo(
-    () => location.state?.draw || obterSorteioAtual(),
-    [location.state?.draw]
-  );
+  const {
+    sorteio,
+    carregando: carregandoSorteio,
+    erro: erroSorteio,
+  } = useUltimoSorteio({
+    habilitado: !location.state?.draw && !location.state?.drawId,
+  });
+  const draw = location.state?.draw || sorteio;
   const drawId = location.state?.drawId || draw?.drawId;
   const timesSorteados = location.state?.times || draw?.times || [];
   const participacoes =
@@ -119,7 +123,13 @@ export function Partidas() {
       <Link to="/historico">Ver partidas e resultados</Link>
 
       {erro && <MensagemErroPartida role="alert">{erro}</MensagemErroPartida>}
-      {!drawId && (
+      {!drawId && carregandoSorteio && (
+        <p role="status">Carregando último sorteio...</p>
+      )}
+      {!drawId && erroSorteio && (
+        <MensagemErroPartida role="alert">{erroSorteio}</MensagemErroPartida>
+      )}
+      {!drawId && !carregandoSorteio && !erroSorteio && (
         <CartaoCriacaoPartida>
           <h2>Nenhum sorteio disponível</h2>
           <p>Faça um sorteio para escolher os times deste confronto.</p>

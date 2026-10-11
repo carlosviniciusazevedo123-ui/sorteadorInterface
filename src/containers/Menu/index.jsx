@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useJogadores } from '../../hooks/useJogadores';
-import { usePartidas } from '../../hooks/usePartidas';
+import { useUltimoJogo } from '../../hooks/useUltimoJogo';
+import { useUltimoSorteio } from '../../hooks/useUltimoSorteio';
 import { limparSessao, obterUsuario } from '../../services/session';
-import { obterSorteioAtual } from '../../services/sorteioAtual';
 import {
   Cabecalho,
   PerfilUsuario,
@@ -30,7 +30,16 @@ import {
   AcoesGrid,
   CartaoPartida,
   CartaoSorteioVazio,
-  SecaoUltimoSorteio,
+  SecaoUltimoJogo,
+  PlacarJogo,
+  ConfrontoJogo,
+  InformacoesJogo,
+  StatusJogo,
+  NotaResumo,
+  ElencosUltimoJogo,
+  TimeUltimoJogo,
+  ListaJogadoresTime,
+  CabecalhoUltimoJogo,
   AcaoPrincipal,
   IconeAcao,
   TextoAcao,
@@ -45,14 +54,14 @@ export function Menu() {
     carregando: carregandoJogadores,
     erro: erroJogadores,
   } = useJogadores();
+  const { ultimoJogo, placar, carregando, erro } = useUltimoJogo();
   const {
-    partidas: matches,
-    carregando: carregandoPartidas,
-    erro: erroPartidas,
-  } = usePartidas();
+    sorteio: ultimoSorteio,
+    carregando: carregandoSorteio,
+    erro: erroSorteio,
+  } = useUltimoSorteio();
 
   const [usuario] = useState(obterUsuario);
-  const [ultimoSorteio] = useState(obterSorteioAtual);
 
   const primeiroNome = usuario?.name?.trim().split(/\s+/)[0] || 'por aí';
   const primeiroNomeFormatado =
@@ -74,9 +83,26 @@ export function Menu() {
     navigate('/login', { replace: true });
   }
 
-  const partidasPendentes = matches.filter(
-    (partida) => partida.status === 'pending'
-  ).length;
+  const jogo = ultimoJogo?.jogo;
+  const times = ultimoJogo?.partida.teams || [];
+  const timeA =
+    times.find((time) => time.id === jogo?.team_a_id) || jogo?.teamA;
+  const timeB =
+    times.find((time) => time.id === jogo?.team_b_id) || jogo?.teamB;
+  const nomeTime = (time) =>
+    time?.name ||
+    (time?.team_number != null
+      ? `Time ${time.team_number}`
+      : 'Time não informado');
+  const dataJogo =
+    jogo &&
+    new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(jogo.finished_at));
 
   return (
     <Pagina>
@@ -115,38 +141,97 @@ export function Menu() {
           </ValorResumo>
         </CartaoResumo>
         <CartaoPartida>
-          <TituloResumo>Partidas aguardando início:</TituloResumo>
-
+          <TituloResumo>Último sorteio:</TituloResumo>
           <ValorResumo>
-            {carregandoPartidas
+            {carregandoSorteio
               ? 'Carregando...'
-              : erroPartidas
-                ? 'Não foi possível carregar'
-                : partidasPendentes}
+              : erroSorteio
+                ? 'Indisponível'
+                : ultimoSorteio
+                  ? `${ultimoSorteio.times.length} times`
+                  : 'Nenhum'}
           </ValorResumo>
+          <NotaResumo>
+            {erroSorteio ? (
+              <span role="alert">{erroSorteio}</span>
+            ) : carregandoSorteio ? (
+              'Buscando último sorteio'
+            ) : ultimoSorteio ? (
+              'Último sorteio realizado'
+            ) : (
+              'Nenhum sorteio realizado'
+            )}
+          </NotaResumo>
         </CartaoPartida>
       </ResumoGrid>
-      <SecaoUltimoSorteio aria-label="Último sorteio">
-        <TituloSecao>Último sorteio</TituloSecao>
+      <SecaoUltimoJogo aria-label="Último jogo">
+        <TituloSecao>Último jogo</TituloSecao>
         <CartaoSorteioVazio>
-          {ultimoSorteio ? (
-            <>
-              <span>
-                {ultimoSorteio.times.length} times ·{' '}
-                {ultimoSorteio.participacoes.length} jogadores sorteados
-              </span>
-              <AcaoVazia to="/partidas" state={{ draw: ultimoSorteio }}>
-                Ver times e criar partida
+          {carregando ? (
+            <span role="status">Carregando último jogo...</span>
+          ) : erro ? (
+            <span role="alert">{erro}</span>
+          ) : jogo ? (
+            <InformacoesJogo>
+              <CabecalhoUltimoJogo>
+                <StatusJogo>Finalizado</StatusJogo>
+                <time dateTime={jogo.finished_at}>{dataJogo}</time>
+              </CabecalhoUltimoJogo>
+              <ConfrontoJogo>
+                <strong className="time-a">{nomeTime(timeA)}</strong>
+                <PlacarJogo
+                  aria-label={
+                    placar
+                      ? `Placar: ${placar.a} a ${placar.b}`
+                      : 'Placar indisponível'
+                  }
+                >
+                  {placar ? `${placar.a} × ${placar.b}` : '— × —'}
+                </PlacarJogo>
+                <strong className="time-b">{nomeTime(timeB)}</strong>
+              </ConfrontoJogo>
+              <ElencosUltimoJogo>
+                {[timeA, timeB].map((time, indice) => (
+                  <TimeUltimoJogo
+                    key={time?.id || indice}
+                    $segundo={indice === 1}
+                  >
+                    {time?.players?.length ? (
+                      <ListaJogadoresTime
+                        aria-label={`Jogadores do ${nomeTime(time)}`}
+                      >
+                        {time.players.map((jogador, indiceJogador) => (
+                          <li
+                            key={
+                              jogador.id || jogador.player_id || indiceJogador
+                            }
+                          >
+                            <strong>
+                              {jogador.player_name ||
+                                jogador.name ||
+                                'Nome não informado'}
+                            </strong>
+                          </li>
+                        ))}
+                      </ListaJogadoresTime>
+                    ) : (
+                      <p>Jogadores não informados.</p>
+                    )}
+                  </TimeUltimoJogo>
+                ))}
+              </ElencosUltimoJogo>
+              <AcaoVazia to={`/jogo/${ultimoJogo.partida.id}/${jogo.id}`}>
+                Ver detalhes do jogo
               </AcaoVazia>
-            </>
+            </InformacoesJogo>
           ) : (
             <>
-              <span>Nenhum sorteio disponível nesta sessão.</span>
-              <AcaoVazia to="/sorteio">Fazer sorteio</AcaoVazia>
+              <span>Nenhum jogo finalizado ainda.</span>
+              <AcaoVazia to="/partidas">Ver partidas</AcaoVazia>
             </>
           )}
         </CartaoSorteioVazio>
-      </SecaoUltimoSorteio>
+      </SecaoUltimoJogo>
       <SecaoAcoes>
         <TituloSecao>Ações rápidas</TituloSecao>
         <AcoesGrid>

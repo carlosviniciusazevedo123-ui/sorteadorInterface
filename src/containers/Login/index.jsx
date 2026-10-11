@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { api } from '../../services/api';
 import { obterUsuario, salvarSessao } from '../../services/session';
+import { mensagemDoErro } from '../../utils/mensagemDoErro';
 import './styles.css';
 
 const SAVED_EMAIL_KEY = 'sorteador.email';
@@ -204,9 +205,16 @@ export function Login({ onRegister, onLoginSuccess, initialEmail = '' }) {
           'E-mail ou senha incorretos. Confira seus dados e tente novamente.'
         );
       } else if (Array.isArray(backendError)) {
-        setError(backendError.join(' '));
+        setError(
+          mensagemDoErro(requestError, 'Confira seu e-mail e sua senha.')
+        );
       } else if (backendError) {
-        setError(backendError);
+        setError(
+          mensagemDoErro(
+            requestError,
+            'Não foi possível entrar. Tente novamente.'
+          )
+        );
       } else if (requestError.response) {
         setError('Não foi possível entrar. Tente novamente.');
       } else {

@@ -1,5 +1,5 @@
 import { Trash2, Pencil } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useJogadores } from '../../hooks/useJogadores';
 import { api } from '../../services/api';
@@ -24,9 +24,12 @@ export function Jogadores() {
   const { jogadores, carregando, erro, removerJogador } = useJogadores();
   const [erroExclusao, setErroExclusao] = useState('');
   const [idExcluindo, setIdExcluindo] = useState(null);
+  const exclusaoEmAndamento = useRef(false);
 
   async function excluirJogador(jogador) {
+    if (exclusaoEmAndamento.current) return;
     if (!window.confirm(`Deseja excluir ${jogador.name}?`)) return;
+    exclusaoEmAndamento.current = true;
 
     setErroExclusao('');
     setIdExcluindo(jogador.id);
@@ -41,6 +44,7 @@ export function Jogadores() {
           : 'Não foi possível excluir o jogador.'
       );
     } finally {
+      exclusaoEmAndamento.current = false;
       setIdExcluindo(null);
     }
   }
@@ -120,7 +124,7 @@ export function Jogadores() {
                   }
                   title={`Excluir ${jogador.name}`}
                   onClick={() => excluirJogador(jogador)}
-                  disabled={idExcluindo === jogador.id}
+                  disabled={idExcluindo !== null}
                 >
                   <Trash2 size={18} aria-hidden="true" />
                 </BotaoExcluirJogador>

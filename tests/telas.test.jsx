@@ -52,7 +52,7 @@ describe('Telas completas', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: /Ana/ }));
     fireEvent.click(screen.getByRole('checkbox', { name: /Bia/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Sortear times' }));
-    await screen.findByText('Falha temporária');
+    await screen.findByText('Não foi possível realizar o sorteio.');
     expect(screen.getByRole('checkbox', { name: /Ana/ }).checked).toBe(true);
     expect(
       screen.getByRole('spinbutton', { name: 'Jogadores de linha por time' })
@@ -60,7 +60,9 @@ describe('Telas completas', () => {
     ).toBe('1');
     fireEvent.click(screen.getByRole('button', { name: 'Sortear times' }));
     await screen.findByRole('heading', { name: 'Times sorteados' });
-    expect(screen.queryByText('Falha temporária')).toBeNull();
+    expect(
+      screen.queryByText('Não foi possível realizar o sorteio.')
+    ).toBeNull();
     expect(api.post).toHaveBeenCalledTimes(3);
   });
 
@@ -90,31 +92,34 @@ describe('Telas completas', () => {
     );
     salvarSorteioAtual({
       drawId: 'draw',
-      times,
+      times: [...times, ...times],
       jogadores,
       participacoes: [{ id: '1' }, { id: '2' }],
     });
-    api.get.mockResolvedValue({ data: [] });
+    api.get.mockImplementation(async (url) => ({
+      data:
+        url === '/players'
+          ? []
+          : url === '/draws/latest'
+            ? {
+                draw: { id: 'draw', teams: times },
+                participants: [],
+                drawn_at: '2026-10-01',
+              }
+            : null,
+    }));
     renderTela(<Menu />);
     await waitFor(() => expect(screen.queryByText('Carregando...')).toBeNull());
-    expect(
-      screen.queryByText('2 times · 2 jogadores sorteados')
-    ).not.toBeNull();
-    expect(
-      screen
-        .getByRole('link', { name: 'Ver times e criar partida' })
-        .getAttribute('href')
-    ).toBe('/partidas');
-    expect(
-      screen.queryByText('Nenhum sorteio disponível nesta sessão.')
-    ).toBeNull();
+    expect(screen.queryByText('2 times')).not.toBeNull();
+    expect(screen.queryByText('Último sorteio realizado')).not.toBeNull();
+    expect(screen.queryByText('Nenhum jogo finalizado ainda.')).not.toBeNull();
   });
 
-  it('exibe as duas rodadas da mesma partida', async () => {
+  it('exibe cada jogo como uma partida independente no histórico', async () => {
     api.get.mockResolvedValue({
       data: [
         {
-          id: 'partida',
+          id: 'partida-1',
           teams: times,
           games: [
             {
@@ -125,11 +130,17 @@ describe('Telas completas', () => {
               status: 'finished',
               winner_team_id: 'time-a',
             },
+          ],
+        },
+        {
+          id: 'partida-2',
+          teams: times,
+          games: [
             {
               id: 'g2',
               team_a_id: 'time-a',
               team_b_id: 'time-b',
-              round: 2,
+              round: 1,
               status: 'finished',
               winner_team_id: 'time-b',
             },
@@ -138,8 +149,7 @@ describe('Telas completas', () => {
       ],
     });
     renderTela(<Historico />);
-    await screen.findByText('Rodada 1');
-    expect(screen.queryByText('Rodada 2')).not.toBeNull();
+    expect(await screen.findAllByText('Rodada 1')).toHaveLength(2);
     expect(screen.getAllByText('Vencedor:')).toHaveLength(2);
   });
 });

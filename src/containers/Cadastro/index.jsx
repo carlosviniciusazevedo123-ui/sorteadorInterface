@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { api } from '../../services/api';
+import { mensagemDoErro } from '../../utils/mensagemDoErro';
 import '../Login/styles.css';
 import './styles.css';
 
@@ -61,9 +62,19 @@ export function Cadastro({ onLogin }) {
       ) {
         setError('Este e-mail já está cadastrado. Tente entrar na sua conta.');
       } else if (Array.isArray(backendError)) {
-        setError(backendError.join(' '));
+        setError(
+          mensagemDoErro(
+            requestError,
+            'Confira os campos do cadastro e tente novamente.'
+          )
+        );
       } else if (backendError) {
-        setError(backendError);
+        setError(
+          mensagemDoErro(
+            requestError,
+            'Não foi possível criar sua conta. Tente novamente.'
+          )
+        );
       } else if (requestError.response) {
         setError('Não foi possível criar sua conta. Tente novamente.');
       } else {

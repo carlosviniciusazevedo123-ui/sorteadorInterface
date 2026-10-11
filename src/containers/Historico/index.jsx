@@ -66,7 +66,9 @@ function obterConfronto(partida, jogo) {
 }
 
 export function Historico() {
-  const { partidas, carregando, erro } = usePartidas({ incluirDetalhes: true });
+  const { partidas, carregando, erro, erroDetalhes, recarregar } = usePartidas({
+    incluirDetalhes: true,
+  });
   const partidasOrdenadas = useMemo(
     () => jogosDoHistorico(partidas),
     [partidas]
@@ -85,23 +87,40 @@ export function Historico() {
       )}
 
       {erro && <ErroHistorico role="alert">{erro}</ErroHistorico>}
-
-      {!carregando && !erro && partidasOrdenadas.length === 0 && (
-        <EstadoHistorico>
-          <strong>Nenhuma partida por aqui ainda</strong>
-          <span>Quando você jogar, os confrontos vão aparecer nesta tela.</span>
-        </EstadoHistorico>
+      {erroDetalhes && (
+        <ErroHistorico role="alert">{erroDetalhes}</ErroHistorico>
       )}
+      {(erro || erroDetalhes) && (
+        <button type="button" onClick={recarregar} disabled={carregando}>
+          Tentar novamente
+        </button>
+      )}
+
+      {!carregando &&
+        !erro &&
+        !erroDetalhes &&
+        partidasOrdenadas.length === 0 && (
+          <EstadoHistorico>
+            <strong>Nenhuma partida por aqui ainda</strong>
+            <span>
+              Quando você jogar, os confrontos vão aparecer nesta tela.
+            </span>
+          </EstadoHistorico>
+        )}
 
       {!carregando && partidasOrdenadas.length > 0 && (
         <ListaHistorico>
-          {partidasOrdenadas.map(({ partida, jogo, data, chave }) => {
+          {partidasOrdenadas.map(({ partida, jogo, data, tipoData, chave }) => {
             const confronto = obterConfronto(partida, jogo);
             const status = jogo?.status || partida.status;
             return (
               <CartaoHistorico key={chave}>
                 <CabecalhoHistorico>
-                  <DataHistorico>{formatarData(data)}</DataHistorico>
+                  <DataHistorico>
+                    {data
+                      ? `${tipoData} ${formatarData(data)}`
+                      : 'Data indisponível'}
+                  </DataHistorico>
                   <StatusHistorico $status={status}>
                     {statusEmPortugues[status] ||
                       status ||

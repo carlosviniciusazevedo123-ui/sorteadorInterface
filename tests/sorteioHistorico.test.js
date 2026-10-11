@@ -88,19 +88,20 @@ describe('Último sorteio e histórico completo', () => {
     sessionStorage.setItem('sorteador.drawAtual', '{}');
     expect(obterSorteioAtual()).toBeNull();
   });
-  it('mostra todos os jogos e ordena pelo horário mais recente', () => {
+  it('mostra uma partida por jogo e ordena pelo horário mais recente', () => {
     const jogos = jogosDoHistorico([
       {
         id: 'partida',
-        games: [
-          { id: 'primeiro', finished_at: '2026-10-01T12:00:00Z' },
-          { id: 'segundo', finished_at: '2026-10-01T13:00:00Z' },
-        ],
+        games: [{ id: 'primeiro', finished_at: '2026-10-01T12:00:00Z' }],
+      },
+      {
+        id: 'partida-seguinte',
+        games: [{ id: 'segundo', finished_at: '2026-10-01T13:00:00Z' }],
       },
       { id: 'outra', createdAt: '2026-09-30T12:00:00Z', games: [] },
     ]);
     expect(jogos.map((item) => item.chave)).toEqual([
-      'partida.segundo',
+      'partida-seguinte.segundo',
       'partida.primeiro',
       'outra.sem-jogo',
     ]);

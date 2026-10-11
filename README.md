@@ -21,9 +21,16 @@ O sorteio considera `jogadoresPorTime` como vagas de jogadores de linha.
 Quando a opção de goleiros está ativa, é necessário um goleiro adicional
 por time, conforme a regra do backend.
 
-O último sorteio fica disponível durante a sessão da aba. Ao sair ou trocar
-de conta, os dados locais da sessão são removidos. Eventos e placar são
-recuperados do backend, inclusive ao abrir um jogo em outro dispositivo.
+A Home consulta o último sorteio executado em `GET /draws/latest` e o último
+jogo finalizado em `GET /matches/games/latest`. Essas rotas autenticadas
+devem estar disponíveis no backend antes de publicar este frontend. A ordem
+do sorteio usa a criação das participações persistidas; a do jogo usa
+`Game.finished_at`. Configurações de sorteio sem participações são ignoradas.
+
+A tela de Partidas também recupera o último sorteio do backend, inclusive
+em outro dispositivo. Ao sair ou trocar de conta, os dados locais são
+removidos e o sorteio em andamento é cancelado no cliente. Eventos e placar
+são recuperados do backend.
 
 ## Verificações
 
