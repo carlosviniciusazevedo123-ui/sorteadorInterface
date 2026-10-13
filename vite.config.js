@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
   };
   return {
     plugins: [react()],
+    base: '/sorteadorInterface/',
     server: {
       proxy,
     },
