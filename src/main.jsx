@@ -7,7 +7,7 @@ import { Rotas } from './routes';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/sorteadorInterface">
       <Rotas />
     </BrowserRouter>
   </StrictMode>
