@@ -33,6 +33,8 @@ jobs:
 
       - name: Gerar build
         run: yarn build
+        env:
+          VITE_API_URL: https://bancodosorteador.onrender.com
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
