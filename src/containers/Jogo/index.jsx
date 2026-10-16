@@ -131,7 +131,7 @@ export function Jogo() {
       }
 
       setLinkAvaliacao(
-        new URL(`/avaliacao/${data.token}`, window.location.origin).toString()
+        `${window.location.origin}${import.meta.env.BASE_URL}#/avaliacao/${data.token}`
       );
       setExpiraAvaliacao(data.expires_at || '');
     } catch (error) {
