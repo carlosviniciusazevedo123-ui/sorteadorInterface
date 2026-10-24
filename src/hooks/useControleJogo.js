@@ -173,6 +173,61 @@ export function useControleJogo(matchId, gameId) {
     }
   }
 
+  async function atualizarDuracaoJogo(duration) {
+    if (
+      acaoEmAndamento.current ||
+      partida?.status !== 'pending' ||
+      jogo?.status !== 'pending' ||
+      !Number.isInteger(duration) ||
+      duration < 1
+    ) {
+      return false;
+    }
+
+    acaoEmAndamento.current = true;
+    revisao.current += 1;
+    consultaPeriodica.current?.abort();
+    setErro('');
+    setAtualizando(true);
+
+    try {
+      const { data } = await api.patch(
+        `/matches/${matchId}/games/${gameId}/duration`,
+        { duration }
+      );
+      const jogoAtualizado = obterJogo(data);
+      if (!jogoAtualizado?.id || jogoAtualizado.id !== gameId) {
+        throw new Error('A resposta não trouxe o jogo atualizado.');
+      }
+
+      const partidaAtualizada = partida
+        ? {
+            ...partida,
+            ...(Array.isArray(partida.games)
+              ? {
+                  games: partida.games.map((item) =>
+                    item.id === gameId ? { ...item, ...jogoAtualizado } : item
+                  ),
+                }
+              : {}),
+          }
+        : partida;
+      if (partidaAtualizada) atualizarPartidaLocal(partidaAtualizada);
+      setJogo(
+        enriquecerJogo({ ...jogo, ...jogoAtualizado }, partidaAtualizada)
+      );
+      return true;
+    } catch (error) {
+      setErro(
+        mensagemDoErro(error, 'Não foi possível atualizar a duração do jogo.')
+      );
+      return false;
+    } finally {
+      acaoEmAndamento.current = false;
+      setAtualizando(false);
+    }
+  }
+
   return {
     partida,
     setPartida: atualizarPartidaLocal,
@@ -185,6 +240,7 @@ export function useControleJogo(matchId, gameId) {
     resultadoAberto,
     setResultadoAberto,
     atualizarEstadoJogo,
+    atualizarDuracaoJogo,
     handleFinalizarJogo,
   };
 }

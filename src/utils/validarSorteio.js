@@ -26,8 +26,7 @@ export function validarSorteio({
   )
     return 'Informe entre 1 e 10 reservas por time.';
 
-  const vagasLinha =
-    quantidadeTimes * (jogadoresPorTime + (temReserva ? reservasPorTime : 0));
+  const vagasLinha = quantidadeTimes * jogadoresPorTime;
   const jogadoresLinha = considerarGoleiros
     ? jogadoresSelecionados.filter((jogador) => !jogador.is_goalkeeper)
     : jogadoresSelecionados;

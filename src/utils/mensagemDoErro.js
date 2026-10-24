@@ -8,6 +8,12 @@ export function mensagemDoErro(error, padrao = 'Ocorreu um erro.') {
     return [...new Set(traducoes)].join(' ');
   if (error.response?.status === 429)
     return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+  if (error.response?.status === 401)
+    return 'Sua sessão expirou. Entre novamente para continuar.';
+  if (error.response?.status === 409)
+    return 'Este jogador já participa do sorteio ou não há vaga compatível.';
+  if (error.response?.status === 403)
+    return 'Você não tem permissão para alterar este sorteio.';
   return padrao;
 }
 

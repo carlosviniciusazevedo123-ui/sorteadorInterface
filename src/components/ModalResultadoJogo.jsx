@@ -1,4 +1,4 @@
-import { useFocoModal } from '../../../hooks/useFocoModal';
+import { useFocoModal } from '../hooks/useFocoModal';
 import {
   BotaoAcaoJogo,
   ConfrontoJogo,
@@ -8,7 +8,7 @@ import {
   ModalResultado,
   StatusJogo,
   ValorPlacarJogo,
-} from '../styles';
+} from '../containers/Jogo/styles';
 
 export function ModalResultadoJogo({
   jogo,

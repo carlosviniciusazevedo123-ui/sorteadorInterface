@@ -14,7 +14,7 @@ import { Avaliacao } from '../src/containers/Avaliacao';
 import { Historico } from '../src/containers/Historico';
 import { EditarJogador } from '../src/containers/Jogadores/Cadastro/editarJogador';
 import { Jogo } from '../src/containers/Jogo';
-import { ModalEventoJogo } from '../src/containers/Jogo/components/ModalEventoJogo';
+import { ModalEventoJogo } from '../src/components/ModalEventoJogo';
 import { Partidas } from '../src/containers/Partidas';
 import { useControleJogo } from '../src/hooks/useControleJogo';
 import { api } from '../src/services/api';

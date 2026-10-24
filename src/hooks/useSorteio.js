@@ -117,6 +117,12 @@ export function useSorteio(jogadores) {
         times: respostaDraw.teams,
         participacoes,
         jogadores: jogadoresDoSorteio,
+        configuracao: {
+          playersPerTeam: jogadoresPorTime,
+          hasReserve: temReserva,
+          reservePerTeam: temReserva ? reservasPorTime : 0,
+          considerGoalkeepers: considerarGoleiros,
+        },
       };
 
       salvarSorteioAtual(sorteioConcluido);

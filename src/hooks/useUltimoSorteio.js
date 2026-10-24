@@ -27,6 +27,17 @@ export function useUltimoSorteio({ habilitado = true } = {}) {
           drawId: data.draw.id,
           times: data.draw.teams,
           participacoes: data.participants,
+          configuracao: {
+            playersPerTeam:
+              data.draw.players_per_team ?? data.draw.playersPerTeam ?? 0,
+            hasReserve: data.draw.has_reserve ?? data.draw.hasReserve ?? false,
+            reservePerTeam:
+              data.draw.reserve_per_team ?? data.draw.reservePerTeam ?? 0,
+            considerGoalkeepers:
+              data.draw.consider_goalkeepers ??
+              data.draw.considerGoalkeepers ??
+              false,
+          },
           jogadores: [
             ...new Map(
               data.participants

@@ -127,6 +127,88 @@ export const DetalhesJogo = styled.p`
   text-align: center;
 `;
 
+export const ControlesDuracaoJogo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  > label {
+    color: #8d8980;
+    font-size: 12px;
+  }
+
+  ${DetalhesJogo} {
+    margin: 0;
+  }
+`;
+
+export const CampoDuracaoJogo = styled.input`
+  width: 76px;
+  min-height: 38px;
+  padding: 0 8px;
+  border: 1px solid #dce7d9;
+  border-radius: 9px;
+  color: #302e28;
+  font: inherit;
+  text-align: center;
+
+  &:focus-visible {
+    outline: 3px solid rgba(53, 83, 69, 0.18);
+    border-color: #355345;
+  }
+`;
+
+export const BotaoIconeDuracaoJogo = styled.button`
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #e8e4dc;
+  border-radius: 8px;
+  background: #fff;
+  color: #667468;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: #aebcaf;
+    background: #f5f8f3;
+    color: #355345;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+`;
+
+export const BotaoAcaoDuracaoJogo = styled.button`
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 1px solid #dce7d9;
+  border-radius: 9px;
+  background: #f3f7f1;
+  color: #355345;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #e9efe7;
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.55;
+  }
+`;
+
 export const BotaoAcaoJogo = styled.button`
   width: 100%;
   min-height: 48px;

@@ -374,6 +374,27 @@ export const CabecalhoTimeSorteado = styled.div`
   border-bottom: 1px solid #f0ede7;
 `;
 
+export const BotaoAdicionarJogador = styled.button`
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid #e3e8e0;
+  border-radius: 9px;
+  background: #f7f9f6;
+  color: #355345;
+  cursor: pointer;
+  &:hover {
+    border-color: #aebcaf;
+    background: #e9efe7;
+  }
+  &:focus-visible {
+    outline: 3px solid rgba(53, 83, 69, 0.2);
+    outline-offset: 2px;
+  }
+`;
+
 export const MediaTimeSorteado = styled.span`
   flex: 0 0 auto;
   padding: 5px 8px;

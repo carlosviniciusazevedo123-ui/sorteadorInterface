@@ -1,11 +1,11 @@
-import { useFocoModal } from '../../../hooks/useFocoModal';
+import { useFocoModal } from '../hooks/useFocoModal';
 import {
   BotaoAcaoJogo,
   BotaoEventoJogo,
   CampoEventoJogo,
   FundoModalEvento,
   ModalEvento,
-} from '../styles';
+} from '../containers/Jogo/styles';
 
 function tituloDoEvento(tipo) {
   const titulos = {

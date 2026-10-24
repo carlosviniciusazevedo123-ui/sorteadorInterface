@@ -1,8 +1,14 @@
 import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { UserRoundPlus } from 'lucide-react';
 
 import { useJogadores } from '../../hooks/useJogadores';
 import { useSorteio } from '../../hooks/useSorteio';
+import { useUltimoSorteio } from '../../hooks/useUltimoSorteio';
 import { formatarNome } from '../../utils/formatarNome';
+import { ModalAdicionarJogador } from '../../components/ModalAdicionarJogador';
+import { api } from '../../services/api';
+import { salvarSorteioAtual } from '../../services/sorteioAtual';
 import {
   PaginaJogadores as PaginaSorteio,
   EyebrowJogadores,
@@ -43,6 +49,7 @@ import {
   NumeroJogadorSorteado,
   AcoesResultadoSorteio,
   BotaoSecundarioSorteio,
+  BotaoAdicionarJogador,
 } from './styles';
 
 export function Sorteio() {
@@ -69,8 +76,47 @@ export function Sorteio() {
     alternarSelecao,
     handleSortear,
   } = useSorteio(jogadores);
+  const { sorteio: ultimoSorteio } = useUltimoSorteio({ habilitado: true });
 
   const navigate = useNavigate();
+  const [timeParaAdicionar, setTimeParaAdicionar] = useState(null);
+  const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    if (!resultadoSorteio && ultimoSorteio) setResultadoSorteio(ultimoSorteio);
+  }, [ultimoSorteio, resultadoSorteio, setResultadoSorteio]);
+
+  async function atualizarAposInclusao(jogadorAdicionado) {
+    const { data } = await api.get('/draws/latest');
+    if (
+      data?.draw?.id !== resultadoSorteio.drawId ||
+      !Array.isArray(data.participants) ||
+      !Array.isArray(data.draw.teams)
+    ) {
+      throw new Error(
+        'Jogador incluído, mas não foi possível atualizar a tela. Atualize a página para conferir.'
+      );
+    }
+    const atualizado = {
+      ...resultadoSorteio,
+      times: data.draw.teams,
+      participacoes: data.participants,
+      jogadores: [
+        ...new Map(
+          [
+            ...resultadoSorteio.jogadores,
+            jogadorAdicionado,
+            ...data.participants.map((item) => item.player).filter(Boolean),
+          ].map((item) => [item.id, item])
+        ).values(),
+      ],
+    };
+    salvarSorteioAtual(atualizado);
+    setResultadoSorteio(atualizado);
+    setTimeParaAdicionar(null);
+    setToast(`${formatarNome(jogadorAdicionado.name)} adicionado ao time.`);
+    window.setTimeout(() => setToast(''), 3500);
+  }
 
   const erroExibido = erro || erroCarregamento;
 
@@ -315,6 +361,14 @@ export function Sorteio() {
                         <MediaTimeSorteado>
                           ★ Média {mediaTime}
                         </MediaTimeSorteado>
+                        <BotaoAdicionarJogador
+                          type="button"
+                          title="Adicionar jogador"
+                          aria-label={`Adicionar jogador ao ${time.name || `Time ${time.team_number ?? indice + 1}`}`}
+                          onClick={() => setTimeParaAdicionar(time)}
+                        >
+                          <UserRoundPlus size={17} aria-hidden="true" />
+                        </BotaoAdicionarJogador>
                       </CabecalhoTimeSorteado>
 
                       <ListaJogadoresSorteados>
@@ -362,6 +416,11 @@ export function Sorteio() {
                 })}
               </ListaTimesSorteados>
 
+              {toast && (
+                <p role="status" aria-live="polite">
+                  {toast}
+                </p>
+              )}
               <AcoesResultadoSorteio>
                 <BotaoSecundarioSorteio
                   type="button"
@@ -385,6 +444,16 @@ export function Sorteio() {
           )}
         </SecaoSelecao>
       )}
+      {timeParaAdicionar &&
+        resultadoSorteio?.configuracao?.playersPerTeam > 0 && (
+          <ModalAdicionarJogador
+            sorteio={resultadoSorteio}
+            time={timeParaAdicionar}
+            jogadores={jogadores}
+            onClose={() => setTimeParaAdicionar(null)}
+            onSuccess={atualizarAposInclusao}
+          />
+        )}
     </PaginaSorteio>
   );
 }

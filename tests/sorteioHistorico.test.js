@@ -51,10 +51,8 @@ describe('Validação do sorteio', () => {
       ).not.toBe('');
     }
   );
-  it('confere vagas de reservas e falta de goleiros', () => {
-    expect(validarSorteio({ ...config, temReserva: true })).toContain(
-      '10 jogadores de linha'
-    );
+  it('trata reservas como opcionais e ainda exige goleiros quando configurados', () => {
+    expect(validarSorteio({ ...config, temReserva: true })).toBe('');
     expect(
       validarSorteio({
         ...config,

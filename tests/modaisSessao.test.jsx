@@ -8,8 +8,8 @@ import {
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ModalEventoJogo } from '../src/containers/Jogo/components/ModalEventoJogo';
-import { ModalResultadoJogo } from '../src/containers/Jogo/components/ModalResultadoJogo';
+import { ModalEventoJogo } from '../src/components/ModalEventoJogo';
+import { ModalResultadoJogo } from '../src/components/ModalResultadoJogo';
 import { RotaProtegida } from '../src/middleware/RotaProtegida';
 import { limparSessao, salvarSessao } from '../src/services/session';
 

@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { Check, Pencil, X } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
+import { ModalEventoJogo } from '../../components/ModalEventoJogo';
+import { ModalResultadoJogo } from '../../components/ModalResultadoJogo';
 import { useControleJogo } from '../../hooks/useControleJogo';
 import { useEventosJogo } from '../../hooks/useEventosJogo';
 import { api } from '../../services/api';
@@ -10,8 +13,6 @@ import {
   EyebrowJogadores,
   TituloJogadores,
 } from '../Jogadores/styles';
-import { ModalEventoJogo } from './components/ModalEventoJogo';
-import { ModalResultadoJogo } from './components/ModalResultadoJogo';
 import {
   BotaoControleJogo,
   CartaoJogo,
@@ -35,6 +36,10 @@ import {
   CabecalhoTimesJogo,
   CartaoCronometroJogo,
   ControlesCronometroJogo,
+  ControlesDuracaoJogo,
+  CampoDuracaoJogo,
+  BotaoIconeDuracaoJogo,
+  BotaoAcaoDuracaoJogo,
 } from './styles';
 
 const statusEmPortugues = {
@@ -77,6 +82,7 @@ export function Jogo() {
     resultadoAberto,
     setResultadoAberto,
     atualizarEstadoJogo,
+    atualizarDuracaoJogo,
     handleFinalizarJogo,
   } = useControleJogo(matchId, gameId);
   const [gerandoLinkAvaliacao, setGerandoLinkAvaliacao] = useState(false);
@@ -84,6 +90,45 @@ export function Jogo() {
   const [linkCopiado, setLinkCopiado] = useState(false);
   const [expiraAvaliacao, setExpiraAvaliacao] = useState('');
   const [avaliacaoExpirada, setAvaliacaoExpirada] = useState(false);
+  const [editandoDuracao, setEditandoDuracao] = useState(false);
+  const [duracaoRascunho, setDuracaoRascunho] = useState('');
+  const [erroDuracao, setErroDuracao] = useState('');
+  const [duracaoAtualizada, setDuracaoAtualizada] = useState(false);
+  const [salvandoDuracao, setSalvandoDuracao] = useState(false);
+  const duracaoEmAndamento = useRef(false);
+
+  function iniciarEdicaoDuracao() {
+    setDuracaoRascunho(String(jogo?.duration ?? ''));
+    setErroDuracao('');
+    setDuracaoAtualizada(false);
+    setEditandoDuracao(true);
+  }
+
+  function cancelarEdicaoDuracao() {
+    if (duracaoEmAndamento.current) return;
+    setEditandoDuracao(false);
+    setErroDuracao('');
+  }
+
+  async function salvarDuracao() {
+    if (duracaoEmAndamento.current) return;
+    const duracao = Number(duracaoRascunho);
+    if (!Number.isInteger(duracao) || duracao < 1) {
+      setErroDuracao('Informe uma duração inteira e positiva.');
+      return;
+    }
+    duracaoEmAndamento.current = true;
+    setSalvandoDuracao(true);
+    setErroDuracao('');
+    setDuracaoAtualizada(false);
+    const salva = await atualizarDuracaoJogo(duracao);
+    if (salva) {
+      setEditandoDuracao(false);
+      setDuracaoAtualizada(true);
+    }
+    duracaoEmAndamento.current = false;
+    setSalvandoDuracao(false);
+  }
   const {
     placar,
     eventos,
@@ -324,10 +369,75 @@ export function Jogo() {
               <CronometroJogo aria-label="Tempo decorrido">
                 {formatarTempo(segundosDecorridos)}
               </CronometroJogo>
-              <DetalhesJogo>
-                {jogo.status === 'paused' ? 'Pausado' : '1º tempo'} ·{' '}
-                {jogo.duration}:00
-              </DetalhesJogo>
+              <ControlesDuracaoJogo>
+                {editandoDuracao ? (
+                  <>
+                    <label htmlFor="duracao-jogo">Duração (minutos)</label>
+                    <CampoDuracaoJogo
+                      id="duracao-jogo"
+                      type="number"
+                      min="1"
+                      step="1"
+                      inputMode="numeric"
+                      value={duracaoRascunho}
+                      onChange={(event) => {
+                        setDuracaoRascunho(event.target.value);
+                        setErroDuracao('');
+                      }}
+                      disabled={salvandoDuracao}
+                    />
+                    <BotaoAcaoDuracaoJogo
+                      type="button"
+                      aria-label="Salvar duração"
+                      title="Salvar"
+                      onClick={salvarDuracao}
+                      disabled={salvandoDuracao}
+                    >
+                      <Check size={16} aria-hidden="true" />
+                      Salvar
+                    </BotaoAcaoDuracaoJogo>
+                    <BotaoAcaoDuracaoJogo
+                      type="button"
+                      aria-label="Cancelar edição da duração"
+                      title="Cancelar"
+                      onClick={cancelarEdicaoDuracao}
+                      disabled={salvandoDuracao}
+                    >
+                      <X size={16} aria-hidden="true" />
+                      Cancelar
+                    </BotaoAcaoDuracaoJogo>
+                  </>
+                ) : (
+                  <>
+                    <DetalhesJogo>
+                      {jogo.status === 'paused' ? 'Pausado' : '1º tempo'} ·{' '}
+                      <span aria-label="Duração do jogo">{jogo.duration}</span>
+                      :00
+                    </DetalhesJogo>
+                    <BotaoIconeDuracaoJogo
+                      type="button"
+                      aria-label="Editar duração do jogo"
+                      title={
+                        partida?.status === 'pending' &&
+                        jogo.status === 'pending'
+                          ? 'Editar duração'
+                          : 'A duração só pode ser editada antes do início'
+                      }
+                      onClick={iniciarEdicaoDuracao}
+                      disabled={
+                        partida?.status !== 'pending' ||
+                        jogo.status !== 'pending' ||
+                        atualizando
+                      }
+                    >
+                      <Pencil size={15} aria-hidden="true" />
+                    </BotaoIconeDuracaoJogo>
+                  </>
+                )}
+              </ControlesDuracaoJogo>
+              {erroDuracao && <p role="alert">{erroDuracao}</p>}
+              {duracaoAtualizada && <p role="status">Duração atualizada.</p>}
+              {salvandoDuracao && <p role="status">Salvando duração...</p>}
 
               {jogo.status === 'in_progress' && (
                 <DetalhesJogo>
